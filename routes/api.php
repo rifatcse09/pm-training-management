@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\v1\AuthController;
 use App\Http\Controllers\Api\v1\UserController;
+use App\Http\Controllers\Api\v1\AdminController;
+use App\Http\Middleware\IsAdmin;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -20,7 +22,12 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
-        // Route::get('/users', [EmployeeInfoController::class, 'index']);
-        // Route::post('/store', [EmployeeInfoController::class, 'store']);
+    });
+
+    Route::middleware(['auth:api', IsAdmin::class])->group(function () {
+        Route::get('/admin/pending-users', [AdminController::class, 'pendingUsers']);
+        Route::post('/admin/activate-user/{id}', [AdminController::class, 'activate']);
+        Route::get('/admin/users', [AdminController::class, 'allUsers']);
+        Route::post('/admin/assign-role/{id}', [AdminController::class, 'assignRole']);
     });
 });
