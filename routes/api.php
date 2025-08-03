@@ -24,7 +24,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
     });
 
-    Route::middleware(['auth:api', IsAdmin::class])->group(function () {
+    Route::middleware(['auth:api', 'IsAdmin'])->group(function () {
         Route::get('/admin/pending-users', [AdminController::class, 'pendingUsers']);
         Route::post('/admin/activate-user/{id}', [AdminController::class, 'activate']);
         Route::get('/admin/users', [AdminController::class, 'allUsers']);
