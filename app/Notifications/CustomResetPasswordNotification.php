@@ -9,8 +9,6 @@ class CustomResetPasswordNotification extends ResetPassword
 {
     public function toMail($notifiable)
     {
-
-
         $frontendUrl = config('app.frontend_url', 'https://your-frontend.com');
 
         $resetLink = "{$frontendUrl}/reset-password?token={$this->token}&email=" . urlencode($notifiable->getEmailForPasswordReset());

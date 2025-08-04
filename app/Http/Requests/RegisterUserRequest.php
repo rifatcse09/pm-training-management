@@ -24,10 +24,10 @@ class RegisterUserRequest extends FormRequest
         return [
             'emp_name' => 'required|string|max:255',
             'mobile' => 'required|string|max:20|unique:users,mobile',
-            'email' => 'nullable|email|unique:users,email',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'emp_dob' => 'nullable|date',
-            'gender' => 'nullable|in:male,female,other',
+            'gender' => 'required|in:male,female,other',
         ];
     }
 }
