@@ -1,11 +1,12 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Http\Middleware\IsAdmin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\v1\AuthController;
 use App\Http\Controllers\Api\v1\UserController;
 use App\Http\Controllers\Api\v1\AdminController;
-use App\Http\Middleware\IsAdmin;
+use App\Http\Controllers\Api\v1\Auth\PasswordResetController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -23,6 +24,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
     });
+
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
+    Route::post('/reset-password', [PasswordResetController::class, 'reset']);
 
     Route::middleware(['auth:api', 'IsAdmin'])->group(function () {
         Route::get('/admin/pending-users', [AdminController::class, 'pendingUsers']);

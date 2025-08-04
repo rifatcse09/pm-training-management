@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
+use App\Notifications\CustomResetPasswordNotification;
 
 class User extends Authenticatable implements JWTSubject
 {
+    use Notifiable;
     /**
      * The attributes that are mass assignable.
      *
@@ -45,5 +48,11 @@ class User extends Authenticatable implements JWTSubject
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new CustomResetPasswordNotification($token));
     }
 }
