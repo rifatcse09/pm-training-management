@@ -2,8 +2,6 @@
 
 namespace App\Notifications;
 
-// app/Notifications/CustomResetPasswordNotification.php
-
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Notifications\Messages\MailMessage;
 
@@ -11,7 +9,7 @@ class CustomResetPasswordNotification extends ResetPassword
 {
     public function toMail($notifiable)
     {
-        
+
 
         $frontendUrl = config('app.frontend_url', 'https://your-frontend.com');
 
