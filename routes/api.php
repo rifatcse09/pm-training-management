@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\v1\Auth\AuthController;
 use App\Http\Controllers\Api\v1\UserController;
 use App\Http\Controllers\Api\v1\AdminController;
 use App\Http\Controllers\Api\v1\Auth\PasswordResetController;
+use App\Http\Controllers\Api\v1\DesignationController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -23,6 +24,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
+        Route::apiResource('designations', DesignationController::class);
     });
 
     Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
@@ -34,4 +36,5 @@ Route::prefix('v1')->group(function () {
         Route::get('/admin/users', [AdminController::class, 'allUsers']);
         Route::post('/admin/assign-role/{id}', [AdminController::class, 'assignRole']);
     });
+
 });

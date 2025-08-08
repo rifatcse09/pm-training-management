@@ -15,12 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('password');
             $table->unsignedBigInteger('role_id')->default(3); // 3 = employee
-            $table->string('emp_name');
-            $table->date('emp_dob')->nullable();
-            $table->string('gender', 10)->nullable();
+            $table->string('name');
             $table->string('mobile', 20)->unique();
             $table->string('email')->unique()->nullable();
             $table->boolean('is_active')->default(false);
+             $table->softDeletes();
             $table->timestamps();
         });
 

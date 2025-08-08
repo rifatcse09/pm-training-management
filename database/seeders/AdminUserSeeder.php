@@ -17,13 +17,12 @@ class AdminUserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin@example.com'],
             [
-                'emp_name' => 'Admin User',
+                'name' => 'Admin User',
                 'password' => Hash::make('password123'),
                 'role_id' => 1, // assuming 1 is admin
                 'is_active' => true,
-                'gender' => 'Other',
                 'mobile' => '0123456789',
-                'emp_dob' => '1990-01-01',
+                'designation_id' => 11, // assuming 1 is a valid designation ID
             ]
         );
     }

@@ -20,8 +20,7 @@ class UserService
             'mobile' => $data['mobile'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'emp_dob' => $data['emp_dob'],
-            'gender' => $data['gender'],
+            'designation_id' => $data['designation_id'],
         ]);
     }
 
