@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use App\Http\Middleware\IsAdmin;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\v1\AuthController;
+use App\Http\Controllers\Api\v1\Auth\AuthController;
 use App\Http\Controllers\Api\v1\UserController;
 use App\Http\Controllers\Api\v1\AdminController;
 use App\Http\Controllers\Api\v1\Auth\PasswordResetController;
