@@ -20,11 +20,12 @@ Route::prefix('v1')->group(function () {
     // Public: login
     Route::post('/login', [AuthController::class, 'login']);
 
+    Route::apiResource('designations', DesignationController::class);
+
     // Protected routes
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
-        Route::apiResource('designations', DesignationController::class);
     });
 
     Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
