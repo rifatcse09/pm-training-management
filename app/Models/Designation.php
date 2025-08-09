@@ -12,4 +12,9 @@ class Designation extends Model
     protected $table = 'designations';
 
     protected $fillable = ['grade', 'name', 'class'];
+
+    public function users()
+    {
+        return $this->hasMany(User::class, 'designation_id');
+    }
 }

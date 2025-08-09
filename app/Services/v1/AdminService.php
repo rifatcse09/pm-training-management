@@ -12,7 +12,10 @@ class AdminService
      */
     public function listPendingUsers(): Collection
     {
-        return User::where('is_active', false)->where('role_id', 3)->get(); // role_id 3 = employee
+        return User::where('is_active', false)
+            ->where('role_id', 3) // role_id 3 = employee
+            ->with('designation') // Include designation relationship
+            ->get();
     }
 
     /**
@@ -34,7 +37,7 @@ class AdminService
      */
     public function listAllUsers(): Collection
     {
-        return User::with('role')->get();
+        return User::with('role')->where('is_active', 1)->get();
     }
 
     /**

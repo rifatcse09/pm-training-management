@@ -32,7 +32,7 @@ class AuthController extends Controller
 
     public function me()
     {
-        $user = Auth::user()->load('role');
+        $user = Auth::user()->load(['role', 'designation']); // Include designation relationship
         return response()->json([
             'success' => true,
             'data' => ['resource' => new UserResource($user)],

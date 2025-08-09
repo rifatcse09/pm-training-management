@@ -50,6 +50,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Role::class);
     }
 
+    public function designation()
+    {
+        return $this->belongsTo(Designation::class);
+    }
 
     public function sendPasswordResetNotification($token)
     {
