@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\v1\UserController;
 use App\Http\Controllers\Api\v1\AdminController;
 use App\Http\Controllers\Api\v1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\v1\DesignationController;
+use App\Http\Controllers\Api\v1\EmployeeController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -21,6 +22,13 @@ Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 
     Route::apiResource('designations', DesignationController::class);
+
+    // Employee routes
+    Route::get('employees', [EmployeeController::class, 'index']);
+    Route::post('employees', [EmployeeController::class, 'store']);
+    Route::get('employees/{id}', [EmployeeController::class, 'show']);
+    Route::put('employees/{id}', [EmployeeController::class, 'update']);
+    Route::delete('employees/{id}', [EmployeeController::class, 'destroy']);
 
     // Protected routes
     Route::middleware('auth:api')->group(function () {
