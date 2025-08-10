@@ -33,7 +33,7 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware(['auth:api', 'IsAdmin'])->group(function () {
         Route::get('/admin/pending-users', [AdminController::class, 'listPendingUsers']);
-        Route::post('/admin/activate-user/{id}', [AdminController::class, 'activate']);
+        Route::post('/admin/activate-user/{id}', [AdminController::class, 'activateUser']);
         Route::get('/admin/users', [AdminController::class, 'listAllUsers']);
         Route::post('/admin/assign-role/{id}', [AdminController::class, 'assignRole']);
     });
