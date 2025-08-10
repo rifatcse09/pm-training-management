@@ -49,17 +49,22 @@ Ensure you have the following installed on your system:
    php artisan jwt:secret
    ```
 
-6. Run database migrations:
+6. Create the database:
+   ```bash
+   mysql -u root -p -e "CREATE DATABASE training_app;"
+   ```
+
+7. Run database migrations:
    ```bash
    php artisan migrate
    ```
 
-7. (Optional) Seed the database with sample data:
+8. (Optional) Seed the database with sample data:
    ```bash
    php artisan db:seed
    ```
 
-8. Start the development server:
+9. Start the development server:
    ```bash
    php artisan serve
    ```
