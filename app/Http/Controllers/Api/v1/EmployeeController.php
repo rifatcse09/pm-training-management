@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EmployeeRequest;
-use App\Models\Employee;
+use App\Http\Resources\EmployeeResource;
 use App\Services\EmployeeService;
 use Illuminate\Http\Request;
+use App\Helpers\HttpStatus;
 
 class EmployeeController extends Controller
 {
@@ -19,27 +20,46 @@ class EmployeeController extends Controller
 
     public function index()
     {
-        return response()->json($this->employeeService->getAllEmployees());
+        $employees = $this->employeeService->getAllEmployees();
+        return response()->json([
+            'success' => true,
+            'data' => EmployeeResource::collection($employees),
+        ], HttpStatus::OK);
     }
 
     public function store(EmployeeRequest $request)
     {
-        return response()->json($this->employeeService->createEmployee($request->validated()), 201);
+        $employee = $this->employeeService->createEmployee($request->validated());
+        return response()->json([
+            'success' => true,
+            'data' => new EmployeeResource($employee),
+        ], HttpStatus::CREATED);
     }
 
     public function show($id)
     {
-        return response()->json($this->employeeService->getEmployeeById($id));
+        $employee = $this->employeeService->getEmployeeById($id);
+        return response()->json([
+            'success' => true,
+            'data' => new EmployeeResource($employee),
+        ], HttpStatus::OK);
     }
 
     public function update(EmployeeRequest $request, $id)
     {
-        return response()->json($this->employeeService->updateEmployee($id, $request->validated()));
+        $employee = $this->employeeService->updateEmployee($id, $request->validated());
+        return response()->json([
+            'success' => true,
+            'data' => new EmployeeResource($employee),
+        ], HttpStatus::OK);
     }
 
     public function destroy($id)
     {
         $this->employeeService->deleteEmployee($id);
-        return response()->json(['message' => 'Employee deleted successfully.']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Employee deleted successfully.',
+        ], HttpStatus::OK);
     }
 }
