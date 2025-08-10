@@ -17,9 +17,9 @@ return new class extends Migration
             $table->unsignedBigInteger('role_id')->default(3); // 3 = employee
             $table->string('name');
             $table->string('mobile', 20)->unique();
-            $table->string('email')->unique()->nullable();
+            $table->string('email')->unique();
             $table->boolean('is_active')->default(false);
-             $table->softDeletes();
+            $table->softDeletes();
             $table->timestamps();
         });
 
