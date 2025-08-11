@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\EmployeeRequest;
 use App\Http\Resources\EmployeeResource;
 use App\Services\EmployeeService;
-use Illuminate\Http\Request;
 use App\Helpers\HttpStatus;
 
 class EmployeeController extends Controller

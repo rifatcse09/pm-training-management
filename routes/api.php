@@ -3,12 +3,13 @@
 use Illuminate\Http\Request;
 use App\Http\Middleware\IsAdmin;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\v1\Auth\AuthController;
 use App\Http\Controllers\Api\v1\UserController;
 use App\Http\Controllers\Api\v1\AdminController;
-use App\Http\Controllers\Api\v1\Auth\PasswordResetController;
-use App\Http\Controllers\Api\v1\DesignationController;
 use App\Http\Controllers\Api\v1\EmployeeController;
+use App\Http\Controllers\Api\v1\Auth\AuthController;
+use App\Http\Controllers\Api\v1\OrganizerController;
+use App\Http\Controllers\Api\v1\DesignationController;
+use App\Http\Controllers\Api\v1\Auth\PasswordResetController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -34,6 +35,13 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
+
+        // Organizer routes
+        Route::get('organizers', [OrganizerController::class, 'index']);
+        Route::post('organizers', [OrganizerController::class, 'store']);
+        Route::get('organizers/{id}', [OrganizerController::class, 'show']);
+        Route::put('organizers/{id}', [OrganizerController::class, 'update']);
+        Route::delete('organizers/{id}', [OrganizerController::class, 'destroy']);
     });
 
     Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
