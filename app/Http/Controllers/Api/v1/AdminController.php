@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Services\v1\AdminService;
 use App\Http\Resources\UserResource;
 use App\Helpers\HttpStatus;
+use Illuminate\Http\JsonResponse;
 
 class AdminController extends Controller
 {
@@ -17,7 +18,7 @@ class AdminController extends Controller
         $this->adminService = $adminService;
     }
 
-    public function listPendingUsers()
+    public function listPendingUsers(): JsonResponse
     {
         $users = $this->adminService->listPendingUsers();
         return response()->json([
@@ -26,7 +27,7 @@ class AdminController extends Controller
         ], HttpStatus::OK);
     }
 
-    public function activateUser(Request $request, int $userId)
+    public function activateUser(Request $request, int $userId): JsonResponse
     {
         $user = $this->adminService->activateUser($userId);
 
@@ -43,7 +44,7 @@ class AdminController extends Controller
         ], HttpStatus::OK);
     }
 
-    public function listAllUsers()
+    public function listAllUsers(): JsonResponse
     {
         $users = $this->adminService->listAllUsers();
         return response()->json([
@@ -52,7 +53,7 @@ class AdminController extends Controller
         ], HttpStatus::OK);
     }
 
-    public function assignRole(Request $request, int $userId)
+    public function assignRole(Request $request, int $userId): JsonResponse
     {
         $roleId = $request->input('role_id');
         $user = $this->adminService->assignRole($userId, $roleId);

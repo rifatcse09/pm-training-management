@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Helpers\HttpStatus;
 use App\Models\Designation;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Services\v1\DesignationService;
 use App\Http\Requests\StoreDesignationRequest;
@@ -18,26 +19,29 @@ class DesignationController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(): JsonResponse
     {
         return response()->json($this->service->getAll());
     }
 
-    public function store(StoreDesignationRequest $request)
+    public function store(StoreDesignationRequest $request): JsonResponse
     {
         $designation = $this->service->create($request->validated());
         return response()->json($designation, 201);
     }
 
-    public function update(UpdateDesignationRequest $request, Designation $designation)
+    public function update(UpdateDesignationRequest $request, Designation $designation): JsonResponse
     {
         $designation = $this->service->update($designation, $request->validated());
         return response()->json($designation);
     }
 
-    public function destroy(Designation $designation)
+    public function destroy(Designation $designation): JsonResponse
     {
         $this->service->delete($designation);
-        return response()->noContent();
+        return response()->json([
+            'success' => true,
+            'message' => 'Designation deleted successfully.',
+        ],  HttpStatus::OK);
     }
 }
