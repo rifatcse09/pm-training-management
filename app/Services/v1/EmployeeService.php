@@ -6,9 +6,23 @@ use App\Models\Employee;
 
 class EmployeeService
 {
-    public function getAllEmployees()
+    public function getAllEmployees($page = 1, $perPage = 10, $search = null)
     {
-        return Employee::all();
+        $query = Employee::query();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%$search%")
+                  ->orWhere('email', 'LIKE', "%$search%")
+                  ->orWhere('mobile', 'LIKE', "%$search%")
+                  ->orWhereHas('designation', function ($q) use ($search) {
+                      $q->where('name', 'LIKE', "%$search%")
+                        ->orWhere('grade', 'LIKE', "%$search%"); // Search in grade
+                  });
+            });
+        }
+
+        return $query->with('designation')->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function createEmployee(array $data)

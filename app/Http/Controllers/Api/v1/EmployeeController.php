@@ -7,6 +7,7 @@ use App\Http\Requests\EmployeeRequest;
 use App\Http\Resources\EmployeeResource;
 use App\Services\v1\EmployeeService;
 use App\Helpers\HttpStatus;
+use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
@@ -17,12 +18,24 @@ class EmployeeController extends Controller
         $this->employeeService = $employeeService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $employees = $this->employeeService->getAllEmployees();
+        $search = $request->query('search', null); // Get the search query
+        $employees = $this->employeeService->getAllEmployees(
+            $request->query('page', 1),
+            $request->query('per_page', 10),
+            $search
+        );
+
         return response()->json([
             'success' => true,
-            'data' => EmployeeResource::collection($employees),
+            'data' => EmployeeResource::collection($employees->items()),
+            'meta' => [
+                'current_page' => $employees->currentPage(),
+                'last_page' => $employees->lastPage(),
+                'per_page' => $employees->perPage(),
+                'total' => $employees->total(),
+            ],
         ], HttpStatus::OK);
     }
 
