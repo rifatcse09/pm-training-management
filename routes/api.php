@@ -10,12 +10,17 @@ use App\Http\Controllers\Api\v1\Auth\AuthController;
 use App\Http\Controllers\Api\v1\OrganizerController;
 use App\Http\Controllers\Api\v1\DesignationController;
 use App\Http\Controllers\Api\v1\Auth\PasswordResetController;
+use App\Http\Controllers\Api\v1\TrainingController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Route::get('/user', function (Request $request) {
+//     return $request->user();
+// })->middleware('auth:sanctum');
 
 Route::prefix('v1')->group(function () {
+
+      // Preflight handler (lets Laravel add CORS headers)
+      Route::options('/{any}', fn() => response('', 204))
+      ->where('any', '.*');
 
     // Public: register
     Route::post('/register', [UserController::class, 'register']);
@@ -24,17 +29,26 @@ Route::prefix('v1')->group(function () {
 
     Route::apiResource('designations', DesignationController::class);
 
-    // Employee routes
-    Route::get('employees', [EmployeeController::class, 'index']);
-    Route::post('employees', [EmployeeController::class, 'store']);
-    Route::get('employees/{id}', [EmployeeController::class, 'show']);
-    Route::put('employees/{id}', [EmployeeController::class, 'update']);
-    Route::delete('employees/{id}', [EmployeeController::class, 'destroy']);
-
     // Protected routes
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
+
+        // Employee routes
+        Route::get('employees', [EmployeeController::class, 'index']);
+        Route::post('employees', [EmployeeController::class, 'store']);
+        Route::get('employees/{id}', [EmployeeController::class, 'show']);
+        Route::put('employees/{id}', [EmployeeController::class, 'update']);
+        Route::delete('employees/{id}', [EmployeeController::class, 'destroy']);
+
+        // Training routes
+        Route::controller(TrainingController::class)->group(function () {
+            Route::get('trainings', 'index');
+            Route::post('trainings', 'store');
+            Route::get('trainings/{id}', 'show');
+            Route::put('trainings/{id}', 'update');
+            Route::delete('trainings/{id}', 'destroy');
+        });
 
         // Organizer routes
         Route::controller(OrganizerController::class)->group(function () {

@@ -3,63 +3,32 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
-use App\Services\v1\TrainingService;
-use App\Http\Requests\TrainingRequest;
-use App\Http\Resources\TrainingResource;
-use App\Helpers\HttpStatus;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class TrainingController extends Controller
 {
-    protected $trainingService;
-
-    public function __construct(TrainingService $trainingService)
+    public function index()
     {
-        $this->trainingService = $trainingService;
+        // Logic to list all trainings
     }
 
-    public function index(): JsonResponse
+    public function store(Request $request)
     {
-        $trainings = $this->trainingService->getAllTrainings();
-        return response()->json([
-            'success' => true,
-            'data' => TrainingResource::collection($trainings),
-        ], HttpStatus::OK);
+        // Logic to create a new training
     }
 
-    public function store(TrainingRequest $request): JsonResponse
+    public function show($id)
     {
-        $training = $this->trainingService->createTraining($request->validated());
-        return response()->json([
-            'success' => true,
-            'data' => new TrainingResource($training),
-        ], HttpStatus::CREATED);
+        // Logic to show a specific training
     }
 
-    public function show($id): JsonResponse
+    public function update(Request $request, $id)
     {
-        $training = $this->trainingService->getTrainingById($id);
-        return response()->json([
-            'success' => true,
-            'data' => new TrainingResource($training),
-        ], HttpStatus::OK);
+        // Logic to update a specific training
     }
 
-    public function update(TrainingRequest $request, $id): JsonResponse
+    public function destroy($id)
     {
-        $training = $this->trainingService->updateTraining($id, $request->validated());
-        return response()->json([
-            'success' => true,
-            'data' => new TrainingResource($training),
-        ], HttpStatus::OK);
-    }
-
-    public function destroy($id): JsonResponse
-    {
-        $this->trainingService->deleteTraining($id);
-        return response()->json([
-            'success' => true,
-            'message' => 'Training deleted successfully.',
-        ], HttpStatus::OK);
+        // Logic to delete a specific training
     }
 }
