@@ -33,4 +33,9 @@ class OrganizerService
         $organizer = Organizer::findOrFail($id);
         $organizer->delete();
     }
+
+    public function getProjectOrganizers()
+    {
+        return Organizer::where('is_project', true)->get(); // Fetch only project organizers
+    }
 }

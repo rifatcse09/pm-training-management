@@ -18,7 +18,8 @@ class CreateOrganizersTable extends Migration
             $table->id(); // Auto-incrementing ID
             $table->string('name'); // Name of the organizer
             $table->boolean('is_project')->default(0); // 0 = project, 1 = not project
-            $table->softDeletes();
+            $table->string('place'); // Organizer place
+            $table->softDeletes(); // Soft delete column
             $table->timestamps(); // Created at and updated at timestamps
         });
     }

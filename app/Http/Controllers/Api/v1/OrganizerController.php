@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Services\v1\OrganizerService;
 use App\Http\Resources\OrganizerResource;
-use Illuminate\Http\Request;
+use App\Http\Requests\OrganizerRequest;
 use App\Helpers\HttpStatus;
 use Illuminate\Http\JsonResponse;
 
@@ -27,14 +27,9 @@ class OrganizerController extends Controller
         ], HttpStatus::OK);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(OrganizerRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'is_project' => 'required|boolean',
-        ]);
-
-        $organizer = $this->organizerService->createOrganizer($validated);
+        $organizer = $this->organizerService->createOrganizer($request->validated());
         return response()->json([
             'success' => true,
             'data' => new OrganizerResource($organizer),
@@ -50,14 +45,9 @@ class OrganizerController extends Controller
         ], HttpStatus::OK);
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(OrganizerRequest $request, $id): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'is_project' => 'required|boolean',
-        ]);
-
-        $organizer = $this->organizerService->updateOrganizer($id, $validated);
+        $organizer = $this->organizerService->updateOrganizer($id, $request->validated());
         return response()->json([
             'success' => true,
             'data' => new OrganizerResource($organizer),
@@ -70,6 +60,15 @@ class OrganizerController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Organizer deleted successfully.',
+        ], HttpStatus::OK);
+    }
+
+    public function getProjectOrganizers(): JsonResponse
+    {
+        $organizers = $this->organizerService->getProjectOrganizers();
+        return response()->json([
+            'success' => true,
+            'data' => OrganizerResource::collection($organizers),
         ], HttpStatus::OK);
     }
 }
