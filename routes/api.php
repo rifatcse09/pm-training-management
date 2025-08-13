@@ -37,11 +37,14 @@ Route::prefix('v1')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
 
         // Organizer routes
-        Route::get('organizers', [OrganizerController::class, 'index']);
-        Route::post('organizers', [OrganizerController::class, 'store']);
-        Route::get('organizers/{id}', [OrganizerController::class, 'show']);
-        Route::put('organizers/{id}', [OrganizerController::class, 'update']);
-        Route::delete('organizers/{id}', [OrganizerController::class, 'destroy']);
+        Route::controller(OrganizerController::class)->group(function () {
+            Route::get('organizers', 'index');
+            Route::post('organizers', 'store');
+            Route::get('organizers/{id}', 'show');
+            Route::put('organizers/{id}', 'update');
+            Route::delete('organizers/{id}', 'destroy');
+            Route::get('project-organizers', 'getProjectOrganizers'); // New route
+        });
     });
 
     Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
