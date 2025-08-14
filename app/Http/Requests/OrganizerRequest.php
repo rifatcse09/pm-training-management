@@ -15,7 +15,7 @@ class OrganizerRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'place' => 'required|string|max:255',
+            'place' => 'nullable|string|max:255', // Changed to nullable
             'is_project' => 'required|boolean',
         ];
     }

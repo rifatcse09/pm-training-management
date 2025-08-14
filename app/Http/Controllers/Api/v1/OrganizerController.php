@@ -8,6 +8,7 @@ use App\Http\Resources\OrganizerResource;
 use App\Http\Requests\OrganizerRequest;
 use App\Helpers\HttpStatus;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class OrganizerController extends Controller
 {
@@ -18,12 +19,24 @@ class OrganizerController extends Controller
         $this->organizerService = $organizerService;
     }
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $organizers = $this->organizerService->getAllOrganizers();
+        $search = $request->query('search', null);
+        $organizers = $this->organizerService->getAllOrganizers(
+            $request->query('page', 1),
+            $request->query('per_page', 10),
+            $search
+        );
+
         return response()->json([
             'success' => true,
-            'data' => OrganizerResource::collection($organizers),
+            'data' => OrganizerResource::collection($organizers), // Pass the paginated collection directly
+            'meta' => [
+                'current_page' => $organizers->currentPage(),
+                'last_page' => $organizers->lastPage(),
+                'per_page' => $organizers->perPage(),
+                'total' => $organizers->total(),
+            ],
         ], HttpStatus::OK);
     }
 

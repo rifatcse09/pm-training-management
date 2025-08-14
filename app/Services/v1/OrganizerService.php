@@ -6,9 +6,16 @@ use App\Models\Organizer;
 
 class OrganizerService
 {
-    public function getAllOrganizers()
+    public function getAllOrganizers($page = 1, $perPage = 10, $search = null)
     {
-        return Organizer::all();
+        $query = Organizer::query();
+
+        if ($search) {
+            $query->where('name', 'like', "%{$search}%")
+                  ->orWhere('place', 'like', "%{$search}%");
+        }
+
+        return $query->paginate($perPage, ['*'], 'page', $page); // Use paginate instead of get or all
     }
 
     public function createOrganizer(array $data)
