@@ -18,8 +18,9 @@ class EmployeeResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'designation' => $this->designation->name ?? null,
-            'grade' => $this->designation->grade,
+            'designation_id' => $this->designation_id, // Include designation ID
+            'designation_name' => $this->designation->name ?? null, // Include designation name
+            'grade' => $this->designation->grade ?? null,
             'mobile' => $this->mobile,
             'email' => $this->email,
             'working_place' => $this->working_place,
