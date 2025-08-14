@@ -8,7 +8,7 @@ class TrainingRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return true; // Allow all authorized users to make this request
     }
 
     public function rules(): array
@@ -20,6 +20,7 @@ class TrainingRequest extends FormRequest
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'total_days' => 'required|integer|min:1',
+            'file_link' => 'nullable|file|mimes:pdf,doc,docx|max:2048', // Optional file upload
         ];
     }
 }

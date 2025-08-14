@@ -21,6 +21,7 @@ class CreateTrainingsTable extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->integer('total_days');
+            $table->string('file_link')->nullable(); // Column for storing the uploaded file link
             $table->softDeletes();
             $table->timestamps();
         });
