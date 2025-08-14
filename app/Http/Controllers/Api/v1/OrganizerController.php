@@ -51,20 +51,34 @@ class OrganizerController extends Controller
 
     public function show($id): JsonResponse
     {
-        $organizer = $this->organizerService->getOrganizerById($id);
-        return response()->json([
-            'success' => true,
-            'data' => new OrganizerResource($organizer),
-        ], HttpStatus::OK);
+        try {
+            $organizer = $this->organizerService->getOrganizerById($id);
+            return response()->json([
+                'success' => true,
+                'data' => new OrganizerResource($organizer),
+            ], HttpStatus::OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Organizer not found.',
+            ], HttpStatus::NOT_FOUND);
+        }
     }
 
     public function update(OrganizerRequest $request, $id): JsonResponse
     {
-        $organizer = $this->organizerService->updateOrganizer($id, $request->validated());
-        return response()->json([
-            'success' => true,
-            'data' => new OrganizerResource($organizer),
-        ], HttpStatus::OK);
+        try {
+            $organizer = $this->organizerService->updateOrganizer($id, $request->validated());
+            return response()->json([
+                'success' => true,
+                'data' => new OrganizerResource($organizer),
+            ], HttpStatus::OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Organizer not found or could not be updated.',
+            ], HttpStatus::NOT_FOUND);
+        }
     }
 
     public function destroy($id): JsonResponse

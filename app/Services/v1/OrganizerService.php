@@ -25,13 +25,25 @@ class OrganizerService
 
     public function getOrganizerById($id)
     {
-        return Organizer::findOrFail($id);
+        $organizer = Organizer::find($id);
+
+        if (!$organizer) {
+            throw new \Exception('Organizer not found.');
+        }
+
+        return $organizer;
     }
 
     public function updateOrganizer($id, array $data)
     {
-        $organizer = Organizer::findOrFail($id);
+        $organizer = Organizer::find($id);
+
+        if (!$organizer) {
+            throw new \Exception('Organizer not found.');
+        }
+
         $organizer->update($data);
+
         return $organizer;
     }
 
