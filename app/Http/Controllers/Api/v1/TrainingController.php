@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Helpers\HttpStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TrainingRequest;
 use App\Http\Requests\UpdateTrainingRequest;
 use App\Http\Resources\TrainingResource;
 use App\Services\v1\TrainingService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class TrainingController extends Controller
 {
@@ -20,88 +19,86 @@ class TrainingController extends Controller
         $this->trainingService = $trainingService;
     }
 
-    public function index(Request $request): JsonResponse
+    public function index(): JsonResponse
     {
-        $search = $request->query('search', null);
-        $trainings = $this->trainingService->getAllTrainings(
-            $request->query('page', 1),
-            $request->query('per_page', 10),
-            $search
-        );
+        $trainings = $this->trainingService->getAllTrainings();
 
         return response()->json([
-            'success' => true,
-            'data' => TrainingResource::collection($trainings),
+            'data' => TrainingResource::collection($trainings->items()),
             'meta' => [
                 'current_page' => $trainings->currentPage(),
                 'last_page' => $trainings->lastPage(),
-                'per_page' => $trainings->perPage(),
                 'total' => $trainings->total(),
+                'per_page' => $trainings->perPage(),
             ],
-        ], HttpStatus::OK);
+        ]);
     }
 
     public function store(TrainingRequest $request): JsonResponse
     {
-        $data = $request->all();
-
-        if ($request->hasFile('file_link')) {
-            $data['file_link'] = $request->file('file_link');
-        }
-
-        $training = $this->trainingService->createTraining($data);
+        $training = $this->trainingService->createTraining($request->validated(), $request->file('file_link'));
 
         return response()->json([
             'success' => true,
-            'data' => new TrainingResource($training),
-        ], HttpStatus::CREATED);
+            'message' => 'Training created successfully.',
+            'data' => $this->trainingService->formatTrainingResponse($training),
+        ], 201);
     }
 
     public function show($id): JsonResponse
     {
         try {
             $training = $this->trainingService->getTrainingById($id);
+
             return response()->json([
                 'success' => true,
                 'data' => new TrainingResource($training),
-            ], HttpStatus::OK);
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Training not found.',
-            ], HttpStatus::NOT_FOUND);
+            ], 404);
         }
     }
 
     public function update(UpdateTrainingRequest $request, $id): JsonResponse
     {
-        $data = $request->all();
+        // Log raw request data for debugging
+        Log::info("Raw request data for training ID: {$id}", ['request_data' => $request->all()]);
 
-        if ($request->hasFile('file_link')) {
-            $data['file_link'] = $request->file('file_link');
-        }
+        // Log validated data for debugging
+        Log::info("Validated data for training ID: {$id}", ['validated_data' => $request->validated()]);
 
         try {
-            $training = $this->trainingService->updateTraining($id, $data);
+            // Pass validated data and file to the service
+            $training = $this->trainingService->updateTraining($id, $request->validated(), $request->file('file_link'));
 
             return response()->json([
                 'success' => true,
-                'data' => new TrainingResource($training),
-            ], HttpStatus::OK);
-        } catch (\Exception $e) {
+                'message' => 'Training updated successfully.',
+                'data' => $this->trainingService->formatTrainingResponse($training),
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error("Training not found with ID: {$id}");
             return response()->json([
                 'success' => false,
-                'message' => 'Training not found or could not be updated.',
-            ], HttpStatus::NOT_FOUND);
+                'message' => 'Training not found.',
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error("Error updating training with ID: {$id} - {$e->getMessage()}");
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update training.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 
     public function destroy($id): JsonResponse
     {
         $this->trainingService->deleteTraining($id);
-        return response()->json([
-            'success' => true,
-            'message' => 'Training deleted successfully.',
-        ], HttpStatus::OK);
+
+        return response()->json(['message' => 'Training deleted successfully.']);
     }
 }

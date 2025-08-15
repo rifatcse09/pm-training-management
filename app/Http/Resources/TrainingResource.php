@@ -16,7 +16,8 @@ class TrainingResource extends JsonResource
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'total_days' => $this->total_days,
-            'file_link' => $this->file_link,
+            'file_name' => $this->file_name,
+            'file_link' => $this->file_name ? asset('storage/training/' . $this->file_name) : null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

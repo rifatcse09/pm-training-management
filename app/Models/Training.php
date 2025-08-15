@@ -17,6 +17,15 @@ class Training extends Model
         'start_date',
         'end_date',
         'total_days',
+        'file_name',
+        'file_link',
+    ];
+
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date'   => 'date',
+        'total_days' => 'integer',
+        'type'       => 'integer',
     ];
 
     /**

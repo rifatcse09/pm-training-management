@@ -14,7 +14,7 @@ class UpdateTrainingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|required|string|max:255',
+            'name' => 'sometimes|required|string|max:255', // Allow partial updates
             'type' => 'sometimes|required|in:1,2',
             'organization_id' => 'sometimes|required|exists:organizers,id',
             'start_date' => 'sometimes|required|date',
@@ -22,5 +22,11 @@ class UpdateTrainingRequest extends FormRequest
             'total_days' => 'sometimes|required|integer|min:1',
             'file_link' => 'nullable|file|mimes:pdf,doc,docx|max:2048', // Optional file upload
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        // Merge all input data into the request for PUT requests
+        $this->merge($this->all());
     }
 }
