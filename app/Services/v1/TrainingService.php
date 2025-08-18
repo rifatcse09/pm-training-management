@@ -4,7 +4,6 @@ namespace App\Services\v1;
 
 use App\Models\Training;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 
 class TrainingService
 {
@@ -19,19 +18,16 @@ class TrainingService
         return $query->paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function createTraining(array $data, $file = null)
+    public function createTraining(array $data)
     {
-        if ($file) {
-            $filePath = $this->uploadFile($file); // Store file and get the full path
+        if (isset($data['file_link'])) {
+            $filePath = $this->uploadFile($data['file_link']); // Store file and get the full path
             $data['file_name'] = basename($filePath); // Extract only the file name
             $data['file_link'] = asset('storage/' . $filePath); // Generate the public URL
+            unset($data['file_link']); // Remove file_link from data
         }
 
-        $training = Training::create($data);
-
-        Log::info("Training created successfully: {$training->id}");
-
-        return $training;
+        return Training::create($data);
     }
 
     public function getTrainingById($id)
@@ -39,37 +35,25 @@ class TrainingService
         return Training::findOrFail($id);
     }
 
-    public function updateTraining($id, array $data, $file = null)
+    public function updateTraining($id, array $data)
     {
-        Log::info("Incoming data for training update", ['data' => $data]);
+        $training = Training::findOrFail($id);
 
-        try {
-            $training = Training::findOrFail($id);
-
-            if ($file) {
-                // Delete the old file if a new file is uploaded
-                if ($training->file_name) {
-                    $this->deleteFile($training->file_name);
-                }
-
-                $filePath = $this->uploadFile($file); // Store new file and get the full path
-                $data['file_name'] = basename($filePath); // Extract only the file name
-                $data['file_link'] = asset('storage/' . $filePath); // Generate the public URL
-            } else {
-                // Retain the existing file if no new file is uploaded
-                $data['file_name'] = $training->file_name;
-                $data['file_link'] = $training->file_link;
+        if (isset($data['file_link'])) {
+            // Delete the old file if it exists
+            if ($training->file_name) {
+                Storage::disk('public')->delete('training/' . $training->file_name);
             }
 
-            $training->update($data);
-
-            Log::info("Training updated successfully: {$training->id}");
-
-            return $training;
-        } catch (\Exception $e) {
-            Log::error("Error updating training with ID: {$id} - {$e->getMessage()}");
-            throw $e;
+            $filePath = $this->uploadFile($data['file_link']); // Store new file and get the full path
+            $data['file_name'] = basename($filePath); // Extract only the file name
+            $data['file_link'] = asset('storage/' . $filePath); // Generate the public URL
+            unset($data['file_link']); // Remove file_link from data
         }
+
+        $training->update($data);
+
+        return $training;
     }
 
     public function deleteTraining($id)
@@ -78,12 +62,10 @@ class TrainingService
 
         // Delete the file if it exists
         if ($training->file_name) {
-            $this->deleteFile($training->file_name);
+            Storage::disk('public')->delete($training->file_name);
         }
 
         $training->delete();
-
-        Log::info("Training deleted successfully: {$training->id}");
 
         return true;
     }
@@ -99,20 +81,8 @@ class TrainingService
             return $path; // Returns the file path
         } catch (\Exception $e) {
             // Log the exception for debugging
-            Log::error("File upload error: {$e->getMessage()}");
+            \Log::error("File upload error: {$e->getMessage()}");
             throw $e;
-        }
-    }
-
-    private function deleteFile($fileName)
-    {
-        try {
-            $deleted = Storage::disk('public')->delete('training/' . $fileName);
-            if (!$deleted) {
-                Log::warning("Failed to delete file: training/{$fileName}");
-            }
-        } catch (\Exception $e) {
-            Log::error("Error deleting file: {$e->getMessage()}");
         }
     }
 
@@ -125,7 +95,7 @@ class TrainingService
             'start_date' => $training->start_date,
             'end_date' => $training->end_date,
             'file_name' => $training->file_name, // Actual file name
-            'file_link' => $training->file_name ? asset('storage/training/' . $training->file_name) : null, // Public URL for the file
+            'file_link' => $training->file_name ? asset('storage/' . $training->file_name) : null, // Public URL for the file
         ];
     }
 }

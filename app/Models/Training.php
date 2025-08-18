@@ -14,18 +14,12 @@ class Training extends Model
         'name',
         'type',
         'organization_id',
+        'file_link',
+        'file_name',
         'start_date',
         'end_date',
         'total_days',
-        'file_name',
-        'file_link',
-    ];
-
-    protected $casts = [
-        'start_date' => 'date',
-        'end_date'   => 'date',
-        'total_days' => 'integer',
-        'type'       => 'integer',
+        'file_name', // Add file_name to fillable attributes
     ];
 
     /**
@@ -34,5 +28,11 @@ class Training extends Model
     public function organizer()
     {
         return $this->belongsTo(Organizer::class, 'organization_id');
+    }
+
+    // Accessor for file_link
+    public function getFileLinkAttribute()
+    {
+        return $this->file_name ? asset('storage/' . $this->file_name) : null;
     }
 }

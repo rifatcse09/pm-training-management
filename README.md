@@ -7,6 +7,7 @@ PM Training App is a training management application built with Laravel. It prov
 - API-based authentication with JWT.
 - Modular and scalable architecture.
 - Easy-to-use endpoints for managing training sessions, users, and roles.
+- File upload support with public access via symbolic links.
 
 ## Getting Started
 
@@ -59,15 +60,34 @@ Ensure you have the following installed on your system:
    php artisan migrate
    ```
 
-8. (Optional) Seed the database with sample data:
+8. Create a symbolic link for file storage:
+   ```bash
+   php artisan storage:link
+   ```
+
+   This command creates a symbolic link from `public/storage` to `storage/app/public`, allowing public access to uploaded files.
+
+9. (Optional) Seed the database with sample data:
    ```bash
    php artisan db:seed
    ```
 
-9. Start the development server:
-   ```bash
-   php artisan serve
-   ```
+10. Start the development server:
+    ```bash
+    php artisan serve
+    ```
+
+### File Uploads
+
+Uploaded files are stored in the `storage/app/public` directory. To make them publicly accessible, ensure you have run the following command:
+```bash
+php artisan storage:link
+```
+
+### File Validation Rules
+
+- Allowed file types: `pdf`, `doc`, `docx`
+- Maximum file size: `2MB`
 
 ### Folder Structure
 
@@ -81,6 +101,12 @@ Ensure you have the following installed on your system:
 ### Authentication
 
 The application uses JWT for authentication. To log in, use the `/api/login` endpoint with valid credentials. The response will include a token to be used for subsequent API requests.
+
+## Troubleshooting
+
+- **File Not Found Errors**: Ensure the symbolic link for storage is created using `php artisan storage:link`.
+- **Database Connection Issues**: Verify your `.env` file contains the correct database credentials.
+- **Empty Request Data**: If `PUT` requests are not sending data, ensure the frontend uses `multipart/form-data` for file uploads and the backend handles `PUT` requests correctly.
 
 ## License
 
