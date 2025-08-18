@@ -19,7 +19,6 @@ class Training extends Model
         'start_date',
         'end_date',
         'total_days',
-        'file_name', // Add file_name to fillable attributes
     ];
 
     /**
@@ -34,5 +33,13 @@ class Training extends Model
     public function getFileLinkAttribute()
     {
         return $this->file_name ? asset('storage/' . $this->file_name) : null;
+    }
+
+    // Relationship with EmployeeTraining pivot model
+    public function employees()
+    {
+        return $this->belongsToMany(Employee::class, 'employee_training')
+                    ->using(EmployeeTraining::class)
+                    ->withTimestamps();
     }
 }

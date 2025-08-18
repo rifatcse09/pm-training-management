@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\v1\OrganizerController;
 use App\Http\Controllers\Api\v1\DesignationController;
 use App\Http\Controllers\Api\v1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\v1\TrainingController;
+use App\Http\Controllers\Api\v1\TrainingAssignmentController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -59,6 +60,8 @@ Route::prefix('v1')->group(function () {
             Route::delete('organizers/{id}', 'destroy');
             Route::get('project-organizers', 'getProjectOrganizers'); // New route
         });
+
+        Route::post('trainings/assign', [TrainingAssignmentController::class, 'assign'])->name('trainings.assign');
     });
 
     Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
