@@ -18,6 +18,8 @@ class EmployeeTraining extends Pivot
         'assigned_by',
     ];
 
+    protected $casts = ['assigned_at' => 'date'];
+
     // Relationship with Employee model
     public function employee()
     {
@@ -34,12 +36,6 @@ class EmployeeTraining extends Pivot
     public function assignedBy()
     {
         return $this->belongsTo(User::class, 'assigned_by');
-    }
-
-    // Accessor for meta field
-    public function getMetaAttribute($value)
-    {
-        return json_decode($value, true);
     }
 
 }

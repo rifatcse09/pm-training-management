@@ -7,13 +7,13 @@ use App\Models\Training;
 use App\Helpers\HttpStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Services\v1\OrganizerService;
-use App\Http\Requests\OrganizerRequest;
-use App\Http\Resources\OrganizerResource;
 use App\Http\Requests\AssignTrainingRequest;
 use App\Services\v1\TrainingAssignmentService;
 use Illuminate\Validation\ValidationException;
+use App\Http\Resources\TrainingAssignmentResource;
 
 class TrainingAssignmentController extends Controller
 {
@@ -35,24 +35,45 @@ class TrainingAssignmentController extends Controller
         }
     }
 
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        // filters: status, due_from, due_to, search
-        $query = DB::table('employee_training')
-            ->join('employees','employees.id','=','employee_training.employee_id')
-            ->join('trainings','trainings.id','=','employee_training.training_id')
-            ->select('employee_training.*','employees.name as employee_name','trainings.title as training_title');
+        Log::info('Index method called', [
+            'page' => $request->query('page'),
+            'per_page' => $request->query('per_page'),
+            'search' => $request->query('search'),
+        ]);
 
-        if ($status = $request->get('status')) $query->where('employee_training.status', $status);
-        if ($df = $request->get('due_from')) $query->whereDate('employee_training.due_date', '>=', $df);
-        if ($dt = $request->get('due_to')) $query->whereDate('employee_training.due_date', '<=', $dt);
-        if ($s = $request->get('search')) {
-            $query->where(function($q) use ($s) {
-                $q->where('employees.name','like',"%$s%")
-                  ->orWhere('trainings.title','like',"%$s%");
-            });
+        $page = $request->query('page', 1);
+        $perPage = $request->query('per_page', 10);
+        $search = $request->query('search', null);
+
+        $assignments = $this->trainingAssignmentService->getAllAssignments($page, $perPage, $search);
+
+        if ($assignments->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No training assignments found.',
+                'data' => [],
+            ], 200);
         }
 
-        return $query->orderByDesc('employee_training.id')->paginate(20);
+        return response()->json([
+            'success' => true,
+            'message' => 'Training assignments retrieved successfully.',
+            'data' => TrainingAssignmentResource::collection($assignments->items()),
+            'meta' => [
+                'current_page' => $assignments->currentPage(),
+                'last_page' => $assignments->lastPage(),
+                'total' => $assignments->total(),
+                'per_page' => $assignments->perPage(),
+            ],
+        ], 200);
+    }
+
+    public function getEmployeeTrainings($id)
+    {
+        $employee = Employee::findOrFail($id);
+        $trainings = $employee->trainings()->with('organizer')->get(); // Assuming a relationship exists
+        return response()->json(['data' => $trainings], 200);
     }
 }

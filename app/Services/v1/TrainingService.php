@@ -7,12 +7,13 @@ use Illuminate\Support\Facades\Storage;
 
 class TrainingService
 {
-    public function getAllTrainings($page = 1, $perPage = 10, $search = null)
+    public function getAllTrainings(int $page = 1, int $perPage = 10, ?string $search = null)
     {
         $query = Training::query();
 
         if ($search) {
-            $query->where('name', 'like', "%{$search}%");
+            $query->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
         }
 
         return $query->paginate($perPage, ['*'], 'page', $page);

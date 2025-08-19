@@ -41,12 +41,14 @@ Route::prefix('v1')->group(function () {
         Route::get('employees/{id}', [EmployeeController::class, 'show']);
         Route::put('employees/{id}', [EmployeeController::class, 'update']);
         Route::delete('employees/{id}', [EmployeeController::class, 'destroy']);
+        Route::get('employees/{id}/trainings', [TrainingAssignmentController::class, 'getEmployeeTrainings'])->name('employees.trainings');
 
         // Training routes
         Route::controller(TrainingController::class)->group(function () {
             Route::get('trainings', 'index');
-            Route::post('trainings', 'store');
-            Route::get('trainings/{id}', 'show');
+            Route::post('trainings', 'store'); // Add this line to support POST requests
+            Route::get('trainings/assignments', [TrainingAssignmentController::class, 'index'])->name('trainings.assignments'); // Ensure this route is defined first
+            Route::get('trainings/{id}', 'show')->where('id', '[0-9]+'); // Add constraint to match only numeric IDs
             Route::put('trainings/{id}', 'update');
             Route::delete('trainings/{id}', 'destroy');
         });

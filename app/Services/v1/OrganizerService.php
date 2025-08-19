@@ -6,7 +6,7 @@ use App\Models\Organizer;
 
 class OrganizerService
 {
-    public function getAllOrganizers($page = 1, $perPage = 10, $search = null)
+    public function getAllOrganizers(int $page = 1, int $perPage = 10, ?string $search = null)
     {
         $query = Organizer::query();
 

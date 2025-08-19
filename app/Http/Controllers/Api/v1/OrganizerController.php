@@ -21,23 +21,21 @@ class OrganizerController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $search = $request->query('search', null);
-        $organizers = $this->organizerService->getAllOrganizers(
-            $request->query('page', 1),
-            $request->query('per_page', 10),
-            $search
-        );
+        $search = $request->query('search', null); // Get the search query
+        $page = $request->query('page', 1); // Get the page number
+        $perPage = $request->query('per_page', 10); // Get the per-page limit
+
+        $paginatedOrganizers = $this->organizerService->getAllOrganizers($page, $perPage, $search);
 
         return response()->json([
-            'success' => true,
-            'data' => OrganizerResource::collection($organizers), // Pass the paginated collection directly
+            'data' => OrganizerResource::collection($paginatedOrganizers->items()), // Use OrganizerResource
             'meta' => [
-                'current_page' => $organizers->currentPage(),
-                'last_page' => $organizers->lastPage(),
-                'per_page' => $organizers->perPage(),
-                'total' => $organizers->total(),
+                'current_page' => $paginatedOrganizers->currentPage(),
+                'last_page' => $paginatedOrganizers->lastPage(),
+                'per_page' => $paginatedOrganizers->perPage(),
+                'total' => $paginatedOrganizers->total(),
             ],
-        ], HttpStatus::OK);
+        ]);
     }
 
     public function store(OrganizerRequest $request): JsonResponse

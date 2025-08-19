@@ -9,6 +9,7 @@ use App\Http\Resources\TrainingResource;
 use App\Services\v1\TrainingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 class TrainingController extends Controller
 {
@@ -19,17 +20,23 @@ class TrainingController extends Controller
         $this->trainingService = $trainingService;
     }
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $trainings = $this->trainingService->getAllTrainings();
+        $search = $request->query('search', null); // Get the search query
+        $trainings = $this->trainingService->getAllTrainings(
+            $request->query('page', 1),
+            $request->query('per_page', 10),
+            $search
+        );
 
         return response()->json([
+            'success' => true,
             'data' => TrainingResource::collection($trainings->items()),
             'meta' => [
                 'current_page' => $trainings->currentPage(),
                 'last_page' => $trainings->lastPage(),
-                'total' => $trainings->total(),
                 'per_page' => $trainings->perPage(),
+                'total' => $trainings->total(),
             ],
         ]);
     }

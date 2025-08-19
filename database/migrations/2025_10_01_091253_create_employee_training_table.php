@@ -9,8 +9,8 @@ class CreateEmployeeTrainingTable extends Migration
     {
         Schema::create('employee_training', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained('employee')->cascadeOnDelete();
-            $table->foreignId('training_id')->constrained('training')->cascadeOnDelete();
+            $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
+            $table->foreignId('training_id')->constrained('trainings')->cascadeOnDelete();
             $table->timestamp('assigned_at')->nullable();
             $table->foreignId('assigned_by')->nullable()->constrained('users')->nullOnDelete();
 
