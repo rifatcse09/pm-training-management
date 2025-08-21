@@ -18,7 +18,7 @@ class TrainingResource extends JsonResource
             'end_date' => $this->end_date,
             'total_days' => $this->total_days,
             'file_name' => $this->file_name,
-            'file_link' => $this->file_name ? asset('storage/' . $this->file_name) : null,
+            'file_link' => $this->file_name ? asset('storage/training/' . $this->file_name) : null,
             'countries' => $this->when($this->type == 2, function () {
                 return $this->countries->map(function ($country) {
                     return [
