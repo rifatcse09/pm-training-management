@@ -8,6 +8,7 @@ use Illuminate\Database\Seeder;
 use Database\Seeders\RoleSeeder;
 use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\DesignationSeeder;
+use Database\Seeders\CountriesTableSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,7 +22,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleSeeder::class,
             DesignationSeeder::class,
-            AdminUserSeeder::class
+            AdminUserSeeder::class,
+            CountriesTableSeeder::class
         ]);
     }
 }

@@ -5,17 +5,14 @@ use App\Http\Middleware\IsAdmin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\v1\UserController;
 use App\Http\Controllers\Api\v1\AdminController;
+use App\Http\Controllers\Api\v1\CountryController;
 use App\Http\Controllers\Api\v1\EmployeeController;
+use App\Http\Controllers\Api\v1\TrainingController;
 use App\Http\Controllers\Api\v1\Auth\AuthController;
 use App\Http\Controllers\Api\v1\OrganizerController;
 use App\Http\Controllers\Api\v1\DesignationController;
 use App\Http\Controllers\Api\v1\Auth\PasswordResetController;
-use App\Http\Controllers\Api\v1\TrainingController;
 use App\Http\Controllers\Api\v1\TrainingAssignmentController;
-
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
 
 Route::prefix('v1')->group(function () {
 
@@ -27,6 +24,9 @@ Route::prefix('v1')->group(function () {
     Route::post('/register', [UserController::class, 'register']);
     // Public: login
     Route::post('/login', [AuthController::class, 'login']);
+
+    // Public: fetch countries
+    Route::get('countries', [CountryController::class, 'index']);
 
     Route::apiResource('designations', DesignationController::class);
 
@@ -75,5 +75,4 @@ Route::prefix('v1')->group(function () {
         Route::get('/admin/users', [AdminController::class, 'listAllUsers']);
         Route::post('/admin/assign-role/{id}', [AdminController::class, 'assignRole']);
     });
-
 });

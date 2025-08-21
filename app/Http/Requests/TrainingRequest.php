@@ -21,6 +21,15 @@ class TrainingRequest extends FormRequest
             'end_date' => 'required|date|after_or_equal:start_date',
             'total_days' => 'required|integer|min:1',
             'file_link' => 'nullable|file|mimes:pdf,doc,docx|max:2048', // Validate file upload
+            'countries'        => ['required_if:type,2','array'],
+            'countries.*'      => ['integer','exists:countries,id'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'countries.required_if' => 'Please select at least one country for type 2 trainings.',
         ];
     }
 }

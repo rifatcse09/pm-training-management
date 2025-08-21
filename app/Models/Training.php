@@ -29,6 +29,17 @@ class Training extends Model
         return $this->belongsTo(Organizer::class, 'organization_id');
     }
 
+    public function countries()
+    {
+        // Use 'training_country' if that’s your chosen pivot name
+        return $this->belongsToMany(
+            Country::class,
+            'country_training',
+            'training_id',
+            'country_id'
+        )->withTimestamps();
+    }
+
     // Accessor for file_link
     public function getFileLinkAttribute()
     {
