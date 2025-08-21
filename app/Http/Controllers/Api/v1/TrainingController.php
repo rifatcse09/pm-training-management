@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\TrainingRequest;
-use App\Http\Requests\UpdateTrainingRequest;
-use App\Http\Resources\TrainingResource;
-use App\Services\v1\TrainingService;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Services\v1\TrainingService;
+use App\Http\Requests\TrainingRequest;
+use App\Http\Resources\TrainingResource;
+use App\Http\Requests\UpdateTrainingRequest;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class TrainingController extends Controller
 {
@@ -31,7 +32,7 @@ class TrainingController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => TrainingResource::collection($trainings->items()),
+            'data' => TrainingResource::collection($trainings->items()), // Use TrainingResource
             'meta' => [
                 'current_page' => $trainings->currentPage(),
                 'last_page' => $trainings->lastPage(),
@@ -43,7 +44,7 @@ class TrainingController extends Controller
 
     public function store(TrainingRequest $request): JsonResponse
     {
-        $training = $this->trainingService->createTraining($request->validated(), $request->file('file_link'));
+        $training = $this->trainingService->createTraining($request->validated());
 
         return response()->json([
             'success' => true,
@@ -59,13 +60,19 @@ class TrainingController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => new TrainingResource($training),
+                'data' => new TrainingResource($training), // Use TrainingResource
             ], 200);
-        } catch (\Exception $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Training not found.',
             ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while fetching the training.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -79,14 +86,14 @@ class TrainingController extends Controller
 
         try {
             // Pass validated data and file to the service
-            $training = $this->trainingService->updateTraining($id, $request->validated(), $request->file('file_link'));
+            $training = $this->trainingService->updateTraining($id, $request->validated());
 
             return response()->json([
                 'success' => true,
                 'message' => 'Training updated successfully.',
                 'data' => $this->trainingService->formatTrainingResponse($training),
             ], 200);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             Log::error("Training not found with ID: {$id}");
             return response()->json([
                 'success' => false,

@@ -2,19 +2,31 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Http\Controllers\Controller;
 use App\Models\Country;
-use Illuminate\Http\Request;
 use App\Helpers\HttpStatus;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Services\v1\CountryService;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\CountryResource;
 
 class CountryController extends Controller
 {
-    public function index()
+    protected $countryService;
+
+    public function __construct(CountryService $countryService)
     {
-        $countries = Country::all();
+        $this->countryService = $countryService;
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        $search = $request->query('search', null); // Get the search query
+        $countries = $this->countryService->getAllCountries($search);
+
         return response()->json([
             'success' => true,
-            'data' => $countries,
+            'data' => CountryResource::collection($countries),
         ], HttpStatus::OK);
     }
 
