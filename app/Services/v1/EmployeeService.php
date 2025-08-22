@@ -3,6 +3,7 @@
 namespace App\Services\v1;
 
 use App\Models\Employee;
+use App\Enums\WorkingPlaceEnum;
 
 class EmployeeService
 {
@@ -19,6 +20,12 @@ class EmployeeService
                       $q->where('name', 'LIKE', "%$search%")
                         ->orWhere('grade', 'LIKE', "%$search%"); // Search in grade
                   });
+
+                // Map working place name to ID using WorkingPlaceEnum
+                $workingPlaceId = array_search($search, WorkingPlaceEnum::getNames());
+                if ($workingPlaceId !== false) {
+                    $q->orWhere('working_place', $workingPlaceId);
+                }
             });
         }
 
