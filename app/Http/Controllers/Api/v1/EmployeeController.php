@@ -21,10 +21,15 @@ class EmployeeController extends Controller
     public function index(Request $request)
     {
         $search = $request->query('search', null); // Get the search query
+        $workingPlace = $request->query('working_place', null); // Get the working place filter
+        $designationId = $request->query('designation_id', null); // Get the designation filter
+
         $employees = $this->employeeService->getAllEmployees(
             $request->query('page', 1),
             $request->query('per_page', 10),
-            $search
+            $search,
+            $workingPlace,
+            $designationId
         );
 
         return response()->json([

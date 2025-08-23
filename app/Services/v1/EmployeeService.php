@@ -7,7 +7,7 @@ use App\Enums\WorkingPlaceEnum;
 
 class EmployeeService
 {
-    public function getAllEmployees($page = 1, $perPage = 10, $search = null)
+    public function getAllEmployees($page = 1, $perPage = 10, $search = null, $workingPlace = null, $designationId = null)
     {
         $query = Employee::query();
 
@@ -27,6 +27,14 @@ class EmployeeService
                     $q->orWhere('working_place', $workingPlaceId);
                 }
             });
+        }
+
+        if ($workingPlace) {
+            $query->where('working_place', $workingPlace);
+        }
+
+        if ($designationId) {
+            $query->where('designation_id', $designationId);
         }
 
         return $query->with('designation')->paginate($perPage, ['*'], 'page', $page);
