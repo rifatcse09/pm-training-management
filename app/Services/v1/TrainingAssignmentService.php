@@ -116,6 +116,39 @@ class TrainingAssignmentService
             });
         }
 
-        return $query->with(['training', 'employee', 'designation'])->paginate($perPage, ['*'], 'page', $page);
+        return $query->with([
+            'training.organizer', // Include organizer relation
+            'employee',
+            'designation', // Include designation relation
+        ])->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function editAssignmentForSingleEmployee($assignmentId, Training $training, $employeeId)
+    {
+        try {
+            // Begin a database transaction
+            DB::beginTransaction();
+
+            // Find the assignment by ID
+            $assignment = $training->assignments()->findOrFail($assignmentId);
+
+            // Update the employee_id for the assignment
+            $assignment->update([
+                'employee_id' => $employeeId,
+            ]);
+
+            // Commit the transaction
+            DB::commit();
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of an error
+            DB::rollBack();
+            Log::error('Failed to edit training assignment for single employee', [
+                'assignment_id' => $assignmentId,
+                'training_id' => $training->id,
+                'employee_id' => $employeeId,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
     }
 }
