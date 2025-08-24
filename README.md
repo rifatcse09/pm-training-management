@@ -100,7 +100,7 @@ php artisan storage:link
 
 ### Authentication
 
-The application uses JWT for authentication. To log in, use the `/api/login` endpoint with valid credentials. The response will include a token to be used for subsequent API requests.
+The application uses JWT for authentication. To log in, use the `/api/v1/login` endpoint with valid credentials. The response will include a token to be used for subsequent API requests.
 
 ## Troubleshooting
 
