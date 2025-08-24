@@ -16,7 +16,7 @@ class AssignTrainingRequest extends FormRequest
         return [
             'training_id' => ['required', 'exists:trainings,id'], // Validate training_id
             'employee_ids' => ['required', 'array'],
-            'employee_ids.*' => ['exists:employees,id'],
+            'employee_ids.*' => ['exists:employees,id'], // Validate each employee ID
         ];
     }
 }

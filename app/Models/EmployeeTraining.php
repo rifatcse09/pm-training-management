@@ -14,11 +14,15 @@ class EmployeeTraining extends Pivot
     protected $fillable = [
         'employee_id',
         'training_id',
+        'designation_id', // Add designation_id to fillable
         'assigned_at',
         'assigned_by',
+        'working_place', // Add working_place to fillable
     ];
 
-    protected $casts = ['assigned_at' => 'date'];
+    protected $casts = [
+        'assigned_at' => 'date',
+    ];
 
     // Relationship with Employee model
     public function employee()
@@ -32,10 +36,15 @@ class EmployeeTraining extends Pivot
         return $this->belongsTo(Training::class);
     }
 
+    // Relationship with Designation model
+    public function designation()
+    {
+        return $this->belongsTo(Designation::class, 'designation_id');
+    }
+
     // Relationship with User model for assigned_by
     public function assignedBy()
     {
         return $this->belongsTo(User::class, 'assigned_by');
     }
-
 }
