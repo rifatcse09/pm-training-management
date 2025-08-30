@@ -32,11 +32,15 @@ class AuthService
 
         $token = Auth::login($user);
 
+        // Calculate the expiration time in seconds using config/jwt.php
+        $expiresIn = config('jwt.ttl', 60) * 60; // Default to 60 minutes if not set
+
         return [
             'success' => true,
             'data' => [
                 'access_token' => $token,
                 'token_type' => 'bearer',
+                'expires_in' => $expiresIn,
                 'user' => new UserResource($user),
             ],
             'status' => HttpStatus::OK,
