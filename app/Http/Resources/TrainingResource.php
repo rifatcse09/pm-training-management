@@ -14,11 +14,11 @@ class TrainingResource extends JsonResource
             'type' => $this->type,
             'organization_id' => $this->organization_id,
             'organization_name' => $this->organizer_name ?? $this->organization->name ?? null, // Handle organizer_name gracefully
-            'start_date' => $this->start_date,
-            'end_date' => $this->end_date,
-            'total_days' => $this->total_days,
-            'file_name' => $this->file_name,
-            'file_link' => $this->file_name ? asset('storage/training/' . $this->file_name) : null,
+            // 'start_date' => $this->start_date,
+            // 'end_date' => $this->end_date,
+            // 'total_days' => $this->total_days,
+            // 'file_name' => $this->file_name,
+            // 'file_link' => $this->file_name ? asset('storage/training/' . $this->file_name) : null,
             'countries' => $this->when($this->type == 2, function () {
                 return $this->countries->map(function ($country) {
                     return [
