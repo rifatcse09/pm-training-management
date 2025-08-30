@@ -35,12 +35,12 @@ class TrainingService
         $countries = $data['countries'] ?? []; // Extract countries if provided
         unset($data['countries']); // Remove countries from the main data array
 
-        if (isset($data['file_link'])) {
-            $filePath = $this->uploadFile($data['file_link']); // Store file and get the full path
-            $data['file_name'] = basename($filePath); // Extract only the file name
-            $data['file_link'] = asset('storage/' . $filePath); // Generate the public URL
-            unset($data['file_link']); // Remove file_link from data
-        }
+        // if (isset($data['file_link'])) {
+        //     $filePath = $this->uploadFile($data['file_link']); // Store file and get the full path
+        //     $data['file_name'] = basename($filePath); // Extract only the file name
+        //     $data['file_link'] = asset('storage/' . $filePath); // Generate the public URL
+        //     unset($data['file_link']); // Remove file_link from data
+        // }
 
         $training = Training::create($data);
 
@@ -71,17 +71,17 @@ class TrainingService
         $countries = $data['countries'] ?? []; // Extract countries if provided
         unset($data['countries']); // Remove countries from the main data array
 
-        if (isset($data['file_link'])) {
-            // Delete the old file if it exists
-            if ($training->file_name) {
-                Storage::disk('public')->delete('training/' . $training->file_name);
-            }
+        // if (isset($data['file_link'])) {
+        //     // Delete the old file if it exists
+        //     if ($training->file_name) {
+        //         Storage::disk('public')->delete('training/' . $training->file_name);
+        //     }
 
-            $filePath = $this->uploadFile($data['file_link']); // Store new file and get the full path
-            $data['file_name'] = basename($filePath); // Extract only the file name
-            $data['file_link'] = asset('storage/' . $filePath); // Generate the public URL
-            unset($data['file_link']); // Remove file_link from data
-        }
+        //     $filePath = $this->uploadFile($data['file_link']); // Store new file and get the full path
+        //     $data['file_name'] = basename($filePath); // Extract only the file name
+        //     $data['file_link'] = asset('storage/' . $filePath); // Generate the public URL
+        //     unset($data['file_link']); // Remove file_link from data
+        // }
 
         $training->update($data);
 
@@ -101,9 +101,9 @@ class TrainingService
         $training = Training::findOrFail($id);
 
         // Delete the file if it exists
-        if ($training->file_name) {
-            Storage::disk('public')->delete('training/' . $training->file_name);
-        }
+        // if ($training->file_name) {
+        //     Storage::disk('public')->delete('training/' . $training->file_name);
+        // }
 
         $training->delete();
 

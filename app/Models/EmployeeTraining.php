@@ -18,6 +18,7 @@ class EmployeeTraining extends Pivot
         'assigned_at',
         'assigned_by',
         'working_place', // Add working_place to fillable
+        'group_training_id', // Add group_training_id to fillable
     ];
 
     protected $casts = [
@@ -46,5 +47,11 @@ class EmployeeTraining extends Pivot
     public function assignedBy()
     {
         return $this->belongsTo(User::class, 'assigned_by');
+    }
+
+    // Relationship with GroupTraining model
+    public function groupTraining()
+    {
+        return $this->belongsTo(GroupTraining::class, 'group_training_id');
     }
 }

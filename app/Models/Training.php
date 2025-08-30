@@ -14,11 +14,6 @@ class Training extends Model
         'name',
         'type',
         'organization_id',
-        'file_link',
-        'file_name',
-        'start_date',
-        'end_date',
-        'total_days',
     ];
 
     /**
@@ -38,12 +33,6 @@ class Training extends Model
             'training_id',
             'country_id'
         )->withTimestamps();
-    }
-
-    // Accessor for file_link
-    public function getFileLinkAttribute()
-    {
-        return $this->file_name ? asset('storage/' . $this->file_name) : null;
     }
 
     // Relationship with EmployeeTraining pivot model
