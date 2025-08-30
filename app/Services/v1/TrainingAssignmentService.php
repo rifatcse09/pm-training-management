@@ -5,11 +5,21 @@ namespace App\Services\v1;
 use App\Models\Employee;
 use App\Models\Training;
 use App\Models\EmployeeTraining;
+use App\Models\GroupTraining;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class TrainingAssignmentService
 {
+    protected $groupTrainingService;
+
+    public function __construct(GroupTrainingService $groupTrainingService)
+    {
+        $this->groupTrainingService = $groupTrainingService;
+    }
+
     public function assign(Employee $employee, Training $training, array $data = []): void
     {
         try {
@@ -56,10 +66,21 @@ class TrainingAssignmentService
         }
     }
 
-    public function assignMultiple(Training $training, array $employeeIds): void
+    /**
+     * Assign multiple employees to a training with a group training ID.
+     *
+     * @param Training $training
+     * @param array $employeeIds
+     * @param array $groupTrainingData
+     * @return void
+     */
+    public function assignMultiple(Training $training, array $employeeIds, array $groupTrainingData): void
     {
         try {
-            DB::transaction(function () use ($training, $employeeIds) {
+            DB::transaction(function () use ($training, $employeeIds, $groupTrainingData) {
+                // Create the group training and retrieve its ID
+                $groupTrainingId = $this->groupTrainingService->createGroupTraining($groupTrainingData);
+
                 foreach ($employeeIds as $employeeId) {
                     $employee = Employee::findOrFail($employeeId);
 
@@ -69,25 +90,30 @@ class TrainingAssignmentService
                         'assigned_by' => auth()->id(),
                         'employee_id' => $employee->id,
                         'training_id' => $training->id,
+                        'group_training_id' => $groupTrainingId, // Log the group_training_id
                         'working_place' => $employee->working_place,
                         'designation_id' => $employee->designation_id,
                     ]);
 
-                    // Call the assign method for each employee
-                    $this->assign($employee, $training, [
+                    // Assign the employee to the training with the group_training_id
+                    EmployeeTraining::create([
+                        'employee_id' => $employee->id,
+                        'training_id' => $training->id,
+                        'group_training_id' => $groupTrainingId, // Assign group_training_id
                         'assigned_at' => now(),
                         'assigned_by' => auth()->id(),
                         'working_place' => $employee->working_place,
                         'designation_id' => $employee->designation_id,
                     ]);
                 }
-            });
 
-            // Log success message
-            \Log::info('All employees assigned successfully', [
-                'training_id' => $training->id,
-                'employee_ids' => $employeeIds,
-            ]);
+                // Log success message
+                \Log::info('All employees assigned successfully', [
+                    'training_id' => $training->id,
+                    'group_training_id' => $groupTrainingId,
+                    'employee_ids' => $employeeIds,
+                ]);
+            });
         } catch (\Exception $e) {
             // Log the exception for debugging
             \Log::error('Failed to assign employees to training', [
@@ -150,5 +176,60 @@ class TrainingAssignmentService
             ]);
             throw $e;
         }
+    }
+
+    /**
+     * Assign employees to a training with additional fields and file upload.
+     *
+     * @param array $data
+     * @return void
+     */
+    public function assignTraining(array $data): void
+    {
+        DB::transaction(function () use ($data) {
+            // Handle file upload if file_link is provided
+            if (isset($data['file_link']) && $data['file_link'] instanceof \Illuminate\Http\UploadedFile) {
+                $filePath = $this->uploadFile($data['file_link']);
+                $data['file_name'] = basename($filePath);
+                $data['file_link'] = asset('storage/' . $filePath);
+            }
+
+            // Create a group training record
+            $groupTraining = GroupTraining::create([
+                'start_date' => $data['start_date'],
+                'end_date' => $data['end_date'],
+                'total_days' => $data['total_days'],
+                'file_link' => $data['file_link'] ?? null,
+                'file_name' => $data['file_name'] ?? null,
+            ]);
+
+            // Assign employees to the training
+            foreach ($data['employee_ids'] as $employeeId) {
+                EmployeeTraining::create([
+                    'employee_id' => $employeeId,
+                    'training_id' => $data['training_id'],
+                    'group_training_id' => $groupTraining->id,
+                    'assigned_at' => now(),
+                    'assigned_by' => auth()->id(),
+                ]);
+            }
+
+            Log::info('Training assigned successfully', [
+                'training_id' => $data['training_id'],
+                'group_training_id' => $groupTraining->id,
+                'employee_ids' => $data['employee_ids'],
+            ]);
+        });
+    }
+
+    /**
+     * Upload a file to storage.
+     *
+     * @param \Illuminate\Http\UploadedFile $file
+     * @return string The file path
+     */
+    private function uploadFile($file): string
+    {
+        return $file->store('group_training_files', 'public');
     }
 }

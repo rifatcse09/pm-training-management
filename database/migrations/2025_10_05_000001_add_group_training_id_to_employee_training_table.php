@@ -8,7 +8,7 @@ class AddGroupTrainingIdToEmployeeTrainingTable extends Migration
 {
     public function up()
     {
-        Schema::table('employee_training', function (Blueprint $table) {
+        Schema::table('group_trainings', function (Blueprint $table) {
             $table->foreignId('group_training_id')
                 ->nullable()
                 ->after('training_id') // Add the column after 'training_id'

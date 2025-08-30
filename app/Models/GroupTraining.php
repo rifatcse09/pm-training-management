@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class GroupTraining extends Model
 {
-    protected $table = 'group_training';
 
     protected $fillable = [
         'start_date',

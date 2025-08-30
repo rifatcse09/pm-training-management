@@ -33,10 +33,19 @@ class TrainingAssignmentController extends Controller
             // Retrieve the Training model instance using the training_id
             $training = Training::findOrFail($data['training_id']);
 
-            // Pass the Training model instance to the service
+            // Prepare group training data
+            $groupTrainingData = [
+                'start_date' => $data['start_date'],
+                'end_date' => $data['end_date'],
+                'total_days' => $data['total_days'],
+                'file_link' => $data['file_link'] ?? null,
+            ];
+
+            // Pass the Training model instance and group training data to the service
             $this->trainingAssignmentService->assignMultiple(
                 $training,
-                $data['employee_ids']
+                $data['employee_ids'],
+                $groupTrainingData
             );
 
             return response()->json([
