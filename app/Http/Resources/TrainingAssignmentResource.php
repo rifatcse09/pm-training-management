@@ -17,6 +17,12 @@ class TrainingAssignmentResource extends JsonResource
             'organizer_name' => $this->training->organizer->name ?? null, // Include organizer name
             'assigned_date' => $this->assigned_at->toDateString(),
             'assigned_by' => $this->assigned_by,
+            // New fields from GroupTraining
+            'start_date' => $this->groupTraining->start_date ?? null,
+            'end_date' => $this->groupTraining->end_date ?? null,
+            'total_days' => $this->groupTraining->total_days ?? null,
+            'file_link' => $this->groupTraining->file_link ?? null,
+            'file_name' => $this->groupTraining->file_name ?? null,
         ];
     }
 }

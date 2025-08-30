@@ -24,6 +24,6 @@ class GroupTraining extends Model
     // Accessor for file_link
     public function getFileLinkAttribute()
     {
-        return $this->file_name ? asset('storage/' . $this->file_name) : null;
+        return $this->file_name ? asset('storage/group_training_files/' . $this->file_name) : null;
     }
 }

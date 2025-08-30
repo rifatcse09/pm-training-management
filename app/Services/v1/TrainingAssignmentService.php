@@ -146,6 +146,9 @@ class TrainingAssignmentService
             'training.organizer', // Include organizer relation
             'employee',
             'designation', // Include designation relation
+            'groupTraining' => function ($q) { // Include groupTraining relation
+                $q->select('id', 'start_date', 'end_date', 'total_days', 'file_link', 'file_name');
+            },
         ])->paginate($perPage, ['*'], 'page', $page);
     }
 
