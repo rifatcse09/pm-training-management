@@ -8,7 +8,7 @@ class CreateGroupTrainingTable extends Migration
 {
     public function up()
     {
-        Schema::create('group_training', function (Blueprint $table) {
+        Schema::create('group_trainings', function (Blueprint $table) {
             $table->id();
             $table->date('start_date'); // Start date of the training group
             $table->date('end_date'); // End date of the training group
@@ -21,6 +21,6 @@ class CreateGroupTrainingTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('group_training');
+        Schema::dropIfExists('group_trainings');
     }
 }
