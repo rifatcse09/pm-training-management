@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\v1\OrganizerController;
 use App\Http\Controllers\Api\v1\DesignationController;
 use App\Http\Controllers\Api\v1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\v1\TrainingAssignmentController;
+use App\Http\Controllers\Api\v1\TrainingReportController;
 
 Route::prefix('v1')->group(function () {
 
@@ -75,4 +76,6 @@ Route::prefix('v1')->group(function () {
         Route::get('/admin/users', [AdminController::class, 'listAllUsers']);
         Route::post('/admin/assign-role/{id}', [AdminController::class, 'assignRole']);
     });
+
+    Route::get('/training-reports', [TrainingReportController::class, 'generateReport']);
 });
