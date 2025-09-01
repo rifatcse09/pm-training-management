@@ -26,7 +26,7 @@ class TrainingAssignmentService
             DB::transaction(function () use ($employee, $training, $data) {
                 $exists = $employee->trainings()->where('training_id', $training->id)->exists();
                 if ($exists) {
-                    \Log::warning('Employee already assigned to training', [
+                    Log::warning('Employee already assigned to training', [
                         'employee_id' => $employee->id,
                         'training_id' => $training->id,
                     ]);
@@ -34,7 +34,7 @@ class TrainingAssignmentService
                 }
 
                 // Log the data being inserted
-                \Log::info('Attaching employee to training', [
+                Log::info('Attaching employee to training', [
                     'employee_id' => $employee->id,
                     'training_id' => $training->id,
                     'data' => $data,
@@ -49,13 +49,13 @@ class TrainingAssignmentService
             });
 
             // Log success message
-            \Log::info('Employee assigned successfully', [
+            Log::info('Employee assigned successfully', [
                 'employee_id' => $employee->id,
                 'training_id' => $training->id,
             ]);
         } catch (\Exception $e) {
             // Log the exception for debugging
-            \Log::error('Failed to assign employee to training', [
+            Log::error('Failed to assign employee to training', [
                 'employee_id' => $employee->id,
                 'training_id' => $training->id,
                 'error' => $e->getMessage(),
@@ -85,7 +85,7 @@ class TrainingAssignmentService
                     $employee = Employee::findOrFail($employeeId);
 
                     // Log the employee details
-                    \Log::info('Processing employee assignment', [
+                    Log::info('Processing employee assignment', [
                         'assigned_at' => now(),
                         'assigned_by' => auth()->id(),
                         'employee_id' => $employee->id,
@@ -108,7 +108,7 @@ class TrainingAssignmentService
                 }
 
                 // Log success message
-                \Log::info('All employees assigned successfully', [
+                Log::info('All employees assigned successfully', [
                     'training_id' => $training->id,
                     'group_training_id' => $groupTrainingId,
                     'employee_ids' => $employeeIds,
@@ -116,7 +116,7 @@ class TrainingAssignmentService
             });
         } catch (\Exception $e) {
             // Log the exception for debugging
-            \Log::error('Failed to assign employees to training', [
+            Log::error('Failed to assign employees to training', [
                 'training_id' => $training->id,
                 'employee_ids' => $employeeIds,
                 'error' => $e->getMessage(),
