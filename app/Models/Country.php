@@ -9,15 +9,13 @@ class Country extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'name',
+    ];
 
     public function trainings()
     {
-        return $this->belongsToMany(
-            Training::class,
-            'country_training',
-            'country_id',
-            'training_id'
-        )->withTimestamps();
+        return $this->belongsToMany(Training::class, 'country_training')
+                    ->withTimestamps();
     }
 }

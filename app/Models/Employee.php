@@ -6,6 +6,7 @@ use App\Models\EmployeeTraining;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Enums\WorkingPlaceEnum;
 
 class Employee extends Model
 {
@@ -16,7 +17,7 @@ class Employee extends Model
         'designation_id',
         'mobile',
         'email',
-        'working_place',
+        'working_place', // Ensure this column exists in the database
     ];
 
     public function designation()
@@ -24,10 +25,19 @@ class Employee extends Model
         return $this->belongsTo(Designation::class);
     }
 
-    // Relationship with EmployeeTraining pivot model
-    public function trainings() {
-        return $this->belongsToMany(Training::class, 'employee_training')
-               ->using(EmployeeTraining::class)
-               ->withTimestamps();
+    public function employeeTrainings() {
+        return $this->hasMany(EmployeeTraining::class);
+    }
+
+    public function trainings()
+    {
+        return $this->belongsToMany(GroupTraining::class, 'employee_training')
+            ->using(EmployeeTraining::class)
+            ->withTimestamps();
+    }
+
+    public function getWorkingPlaceNameAttribute(): ?string
+    {
+        return WorkingPlaceEnum::getNameById($this->working_place);
     }
 }

@@ -15,20 +15,20 @@ return [
     |
     */
 
-    'paths' => ['api/*'],
+    'paths' => ['api/*', 'training-reports'], // Ensure 'training-reports' is included
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['*'], // Allow all HTTP methods
 
     'allowed_origins' => explode(',', env('ALLOWED_ORIGINS', '*')),
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => ['*'], // Allow all headers
 
-    'exposed_headers' => [],
+    'exposed_headers' => ['Content-Disposition'], // Expose Content-Disposition for file downloads
 
-    'max_age' => 0,
+    'max_age' => 0, // Disable caching of preflight requests
 
-    'supports_credentials' => false,
+    'supports_credentials' => false, // Do not include credentials in CORS requests
 
 ];

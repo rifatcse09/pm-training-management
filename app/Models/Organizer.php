@@ -13,6 +13,6 @@ class Organizer extends Model
     protected $fillable = [
         'name',
         'place',
-        'is_project', // Add is_project field
+        'is_project',
     ];
 }
