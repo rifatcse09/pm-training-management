@@ -4,8 +4,9 @@ namespace App\Services\v1;
 
 use App\Models\Employee;
 use App\Models\Training;
-use App\Models\EmployeeTraining;
 use App\Models\GroupTraining;
+use App\Enums\WorkingPlaceEnum;
+use App\Models\EmployeeTraining;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -133,12 +134,38 @@ class TrainingAssignmentService
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->whereHas('training', function ($q) use ($search) {
-                    $q->where('name', 'LIKE', "%$search%");
-                })->orWhereHas('employee', function ($q) use ($search) {
-                    $q->where('name', 'LIKE', "%$search%")
-                      ->orWhere('email', 'LIKE', "%$search%");
-                });
+                  // Check if the search matches a WorkingPlaceEnum value
+                $workingPlaceId = array_search($search, WorkingPlaceEnum::getNames());
+                if ($workingPlaceId !== false) {
+                    // Filter by working_place in the employees table
+                    $q->whereHas('employee', function ($q) use ($workingPlaceId) {
+                        $q->where('working_place', $workingPlaceId);
+                    });
+                }elseif(preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $search)){
+                    // Check if the search term is a date in dd/mm/yyyy format
+
+                    // Convert the date to yyyy-mm-dd format
+                    $formattedDate = \Carbon\Carbon::createFromFormat('d/m/Y', $search)->format('Y-m-d');
+
+                    // Filter by start_date or end_date in the groupTraining table
+                    $q->whereHas('groupTraining', function ($q) use ($formattedDate) {
+                        $q->where('start_date', '<=', $formattedDate)
+                          ->where('end_date', '>=', $formattedDate);
+                    });
+                } else {
+                    $q->whereHas('training', function ($q) use ($search, $workingPlaceId) {
+                        $q->where('name', 'LIKE', "%$search%")
+                        ->orWhereHas('organizer', function ($q) use ($search, $workingPlaceId) {
+                            $q->where('name', 'LIKE', "%$search%");
+                        });
+                    })->orWhereHas('employee', function ($q) use ($search) {
+                        $q->where('name', 'LIKE', "%$search%")
+                          ->orWhere('email', 'LIKE', "%$search%");
+                    })->orWhereHas('designation', function ($q) use ($search) {
+                        $q->where('name', 'LIKE', "%$search%");
+                    });
+                }
+
             });
         }
 
