@@ -24,4 +24,9 @@ enum WorkingPlaceEnum: int
             self::GENERAL_ECONOMY_DIVISION->value => 'সাধারণ অর্থনীতি বিভাগ',
         ];
     }
+
+    public static function getNameById(?int $id): ?string
+    {
+        return self::getNames()[$id] ?? null;
+    }
 }

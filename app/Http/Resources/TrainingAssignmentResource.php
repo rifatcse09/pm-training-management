@@ -18,8 +18,8 @@ class TrainingAssignmentResource extends JsonResource
             'assigned_date' => $this->assigned_at->toDateString(),
             'assigned_by' => $this->assigned_by,
             // New fields from GroupTraining
-            'start_date' => $this->groupTraining->start_date ?? null,
-            'end_date' => $this->groupTraining->end_date ?? null,
+            'start_date' => $this->groupTraining?->start_date?->format('d/m/Y') ?? null,
+            'end_date' => $this->groupTraining?->end_date?->format('d/m/Y') ?? null,
             'total_days' => $this->groupTraining->total_days ?? null,
             'file_link' => $this->groupTraining->file_link ?? null,
             'file_name' => $this->groupTraining->file_name ?? null,

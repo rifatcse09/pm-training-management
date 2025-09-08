@@ -17,4 +17,10 @@ class Designation extends Model
     {
         return $this->hasMany(User::class, 'designation_id');
     }
+
+    public function employeeTrainings()
+    {
+        return $this->hasMany(EmployeeTraining::class);
+    }
+
 }
