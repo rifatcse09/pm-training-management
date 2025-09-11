@@ -76,8 +76,7 @@ class TrainingReportService
                     : 'N/A';
 
                 // designation from assignment first; fallback to employee
-                $designationName = $et->designation->title
-                    ?? $et->employee?->designation?->name
+                $designationName = $et->designation->name
                     ?? 'N/A';
 
                 // compute total days if not stored
@@ -193,8 +192,7 @@ class TrainingReportService
                     ? $t->countries->pluck('name')->implode(', ')
                     : 'N/A';
 
-                $designationName = $et->designation->title
-                    ?? $et->employee?->designation?->name
+                $designationName = $et->designation->name
                     ?? 'N/A';
 
                 $totalDays = $gt->total_days
