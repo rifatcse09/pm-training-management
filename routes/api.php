@@ -67,8 +67,10 @@ Route::prefix('v1')->group(function () {
         Route::post('trainings/assign', [TrainingAssignmentController::class, 'assign'])->name('trainings.assign');
     });
 
-    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
-    Route::post('/reset-password', [PasswordResetController::class, 'reset']);
+    //Route::middleware('throttle:5,1')->group(function () {
+        Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
+        Route::post('/reset-password', [PasswordResetController::class, 'reset']);
+    //});
 
     Route::middleware(['auth:api', 'IsAdmin'])->group(function () {
         Route::get('/admin/pending-users', [AdminController::class, 'listPendingUsers']);
