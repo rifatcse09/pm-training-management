@@ -4,6 +4,7 @@ namespace App\Services\v1;
 
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Mail;
 
 class AdminService
 {
@@ -27,6 +28,9 @@ class AdminService
 
         if ($user && !$user->is_active) {
             $user->update(['is_active' => true]);
+
+            // Send activation email
+            Mail::to($user->email)->send(new \App\Mail\AccountActivated($user));
         }
 
         return $user;
