@@ -128,55 +128,84 @@ class TrainingAssignmentService
         }
     }
 
-    public function getAllAssignments($page = 1, $perPage = 10, $search = null)
+    public function getAllAssignments($page = 1, $perPage = 10, $search = null, $orderBy = null, $orderDirection = 'asc')
     {
-        $query = EmployeeTraining::query();
+        $query = EmployeeTraining::with([
+            'employee.designation',
+            'training.organizer',
+            'groupTraining'
+        ]);
 
+        // Apply search filter if provided
         if ($search) {
-            $query->where(function ($q) use ($search) {
-                  // Check if the search matches a WorkingPlaceEnum value
-                $workingPlaceId = array_search($search, WorkingPlaceEnum::getNames());
-                if ($workingPlaceId !== false) {
-                    // Filter by working_place in the employees table
-                    $q->whereHas('employee', function ($q) use ($workingPlaceId) {
-                        $q->where('working_place', $workingPlaceId);
-                    });
-                }elseif(preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $search)){
-                    // Check if the search term is a date in dd/mm/yyyy format
-
-                    // Convert the date to yyyy-mm-dd format
-                    $formattedDate = \Carbon\Carbon::createFromFormat('d/m/Y', $search)->format('Y-m-d');
-
-                    // Filter by start_date or end_date in the groupTraining table
-                    $q->whereHas('groupTraining', function ($q) use ($formattedDate) {
-                        $q->where('start_date', '<=', $formattedDate)
-                          ->where('end_date', '>=', $formattedDate);
-                    });
-                } else {
-                    $q->whereHas('training', function ($q) use ($search, $workingPlaceId) {
-                        $q->where('name', 'LIKE', "%$search%")
-                        ->orWhereHas('organizer', function ($q) use ($search, $workingPlaceId) {
-                            $q->where('name', 'LIKE', "%$search%");
-                        });
-                    })->orWhereHas('employee', function ($q) use ($search) {
-                        $q->where('name', 'LIKE', "%$search%")
-                          ->orWhere('email', 'LIKE', "%$search%");
-                    })->orWhereHas('designation', function ($q) use ($search) {
-                        $q->where('name', 'LIKE', "%$search%");
-                    });
-                }
-
+            $query->where(function($q) use ($search) {
+                $q->whereHas('training', function ($subQ) use ($search) {
+                    $subQ->where('name', 'LIKE', "%{$search}%");
+                })->orWhereHas('employee', function ($subQ) use ($search) {
+                    $subQ->where('name', 'LIKE', "%{$search}%");
+                })->orWhereHas('employee.designation', function ($subQ) use ($search) {
+                    $subQ->where('name', 'LIKE', "%{$search}%");
+                })->orWhereHas('training.organizer', function ($subQ) use ($search) {
+                    $subQ->where('name', 'LIKE', "%{$search}%");
+                });
             });
         }
 
-        return $query->with([
-            'training.organizer', // Include organizer relation
-            'employee',
-            'designation', // Include designation relation
-            'groupTraining' => function ($q) { // Include groupTraining relation
-                $q->select('id', 'start_date', 'end_date', 'total_days', 'file_link', 'file_name');
-            },
-        ])->paginate($perPage, ['*'], 'page', $page);
+        // Apply sorting if provided
+        if ($orderBy && $orderDirection) {
+            $tableName = (new EmployeeTraining())->getTable(); // Get actual table name
+
+            switch ($orderBy) {
+                case 'training_name':
+                    $query->leftJoin('trainings', $tableName . '.training_id', '=', 'trainings.id')
+                          ->orderBy('trainings.name', $orderDirection)
+                          ->select($tableName . '.*');
+                    break;
+                case 'employee_name':
+                    $query->leftJoin('employees', $tableName . '.employee_id', '=', 'employees.id')
+                          ->orderBy('employees.name', $orderDirection)
+                          ->select($tableName . '.*');
+                    break;
+                case 'designation_name':
+                    $query->leftJoin('employees', $tableName . '.employee_id', '=', 'employees.id')
+                          ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+                          ->orderBy('designations.name', $orderDirection)
+                          ->select($tableName . '.*');
+                    break;
+                case 'organizer_name':
+                    $query->leftJoin('trainings', $tableName . '.training_id', '=', 'trainings.id')
+                          ->leftJoin('organizers', 'trainings.organization_id', '=', 'organizers.id')
+                          ->orderBy('organizers.name', $orderDirection)
+                          ->select($tableName . '.*');
+                    break;
+                case 'working_place':
+                    $query->leftJoin('employees', $tableName . '.employee_id', '=', 'employees.id')
+                          ->orderBy('employees.working_place', $orderDirection)
+                          ->select($tableName . '.*');
+                    break;
+                case 'start_date':
+                    $query->leftJoin('group_trainings', $tableName . '.group_training_id', '=', 'group_trainings.id')
+                          ->orderBy('group_trainings.start_date', $orderDirection)
+                          ->select($tableName . '.*');
+                    break;
+                case 'end_date':
+                    $query->leftJoin('group_trainings', $tableName . '.group_training_id', '=', 'group_trainings.id')
+                          ->orderBy('group_trainings.end_date', $orderDirection)
+                          ->select($tableName . '.*');
+                    break;
+                case 'total_days':
+                    $query->leftJoin('group_trainings', $tableName . '.group_training_id', '=', 'group_trainings.id')
+                          ->orderBy('group_trainings.total_days', $orderDirection)
+                          ->select($tableName . '.*');
+                    break;
+                default:
+                    $query->orderBy($tableName . '.created_at', 'desc');
+            }
+        } else {
+            $query->orderBy((new EmployeeTraining())->getTable() . '.created_at', 'desc');
+        }
+
+        return $query->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function editAssignmentForSingleEmployee($assignmentId, Training $training, $employeeId)

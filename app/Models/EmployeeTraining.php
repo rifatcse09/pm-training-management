@@ -2,55 +2,52 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EmployeeTraining extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'employee_training';
 
     protected $fillable = [
         'employee_id',
         'training_id',
-        'designation_id',
+        'group_training_id',
         'assigned_at',
         'assigned_by',
         'working_place',
-        'group_training_id',
+        'designation_id',
     ];
 
     protected $casts = [
         'assigned_at' => 'datetime',
     ];
 
-    // Relationship with Employee model
-    public function employee()
+    public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'employee_id');
     }
 
-    // Relationship with Training model
-    public function training()
+    public function training(): BelongsTo
     {
         return $this->belongsTo(Training::class, 'training_id');
     }
 
-    // Relationship with GroupTraining model
-    public function groupTraining()
+    public function groupTraining(): BelongsTo
     {
         return $this->belongsTo(GroupTraining::class, 'group_training_id');
     }
 
-    // Relationship with Designation model
     public function designation()
     {
         return $this->belongsTo(Designation::class, 'designation_id');
     }
 
-    // Relationship with User model for assigned_by
-    public function assignedBy()
+    public function assignedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_by');
     }

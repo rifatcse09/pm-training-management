@@ -74,13 +74,17 @@ class TrainingAssignmentController extends Controller
             'page' => $request->query('page'),
             'per_page' => $request->query('per_page'),
             'search' => $request->query('search'),
+            'sort_field' => $request->query('sort_field'),
+            'sort_order' => $request->query('sort_order'),
         ]);
 
         $page = $request->query('page', 1);
         $perPage = $request->query('per_page', 10);
         $search = $request->query('search', null);
+        $sortField = $request->query('sort_field', null);
+        $sortOrder = $request->query('sort_order', 'asc');
 
-        $assignments = $this->trainingAssignmentService->getAllAssignments($page, $perPage, $search);
+        $assignments = $this->trainingAssignmentService->getAllAssignments($page, $perPage, $search, $sortField, $sortOrder);
 
         if ($assignments->isEmpty()) {
             return response()->json([
