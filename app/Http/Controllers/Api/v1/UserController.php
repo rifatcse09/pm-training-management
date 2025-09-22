@@ -28,7 +28,7 @@ class UserController extends Controller
         return response()->json([
             'message' => 'Registration successful. Please wait for admin approval.',
             'user' => $user
-            
+
         ], 201);
     }
 }
