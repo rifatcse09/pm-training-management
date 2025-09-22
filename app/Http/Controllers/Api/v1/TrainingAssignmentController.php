@@ -15,6 +15,7 @@ use App\Services\v1\TrainingAssignmentService;
 use Illuminate\Validation\ValidationException;
 use App\Http\Resources\TrainingAssignmentResource;
 use App\Http\Requests\UpdateTrainingAssignmentRequest;
+use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 
 class TrainingAssignmentController extends Controller
 {
@@ -143,14 +144,46 @@ class TrainingAssignmentController extends Controller
         }
     }
 
-    public function getEmployeeTrainings($id, Request $request): JsonResponse
+    public function generateAssignmentsPdf(Request $request)
     {
-        // Retrieve the EmployeeTraining model instance using the provided ID
-        $employeeTraining = EmployeeTraining::with(['employee', 'training.organizer'])->findOrFail($id);
+        $filters = $request->only(['search', 'employee_id', 'training_id', 'working_place', 'designation_id', 'start_date', 'end_date', 'orderBy', 'orderDirection']);
 
-        return response()->json([
-            'success' => true,
-            'data' => $employeeTraining,
-        ], 200);
+        try {
+            $assignmentsData = $this->trainingAssignmentService->getAssignmentsForPdf($filters);
+
+            // Check if we have data
+            if ($assignmentsData->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No data found for the specified criteria.',
+                ], 404);
+            }
+
+            $pdf = PDF::loadView('pdf.reports.training-assignments', [
+                'assignmentsData' => $assignmentsData,
+                'filters' => $filters,
+                'generatedAt' => now(),
+            ], [], ['mode' => 'utf-8', 'format' => 'A4-L']);
+
+            $filename = 'training-assignments-report-' . now()->format('Y-m-d_H-i-s') . '.pdf';
+
+            return response($pdf->output(), 200)
+                ->header('Content-Type', 'application/pdf')
+                ->header('Content-Disposition', "attachment; filename=\"$filename\"")
+                ->header('Access-Control-Expose-Headers', 'Content-Disposition');
+
+        } catch (\Exception $e) {
+            Log::error('Failed to generate assignments PDF report', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'filters' => $filters
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate PDF report. Please try again later.',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
     }
 }

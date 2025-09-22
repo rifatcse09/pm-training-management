@@ -65,6 +65,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::post('trainings/assign', [TrainingAssignmentController::class, 'assign'])->name('trainings.assign');
+        Route::get('training-assignments/pdf', [TrainingAssignmentController::class, 'generateAssignmentsPdf']);
     });
 
     //Route::middleware('throttle:5,1')->group(function () {
