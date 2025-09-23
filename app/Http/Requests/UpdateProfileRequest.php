@@ -23,7 +23,7 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file_designation' => ['nullable', 'string', 'max:255'],
+            'designation_id' => ['nullable', 'integer', 'exists:designations,id'],
             'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',

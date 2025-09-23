@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\UpdateProfileRequest;
+use App\Helpers\HttpStatus;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\UpdateProfileRequest;
 
 class ProfileController extends Controller
 {
@@ -40,9 +43,16 @@ class ProfileController extends Controller
 
         $user->update($validatedData);
 
+        $user = Auth::user()->load(['role', 'designation']); // Include designation relationship
         return response()->json([
-            'message' => 'Profile updated successfully',
-            'user' => $user->fresh()
-        ]);
+            'success' => true,
+            'data' => ['resource' => new UserResource($user)],
+        ], HttpStatus::OK);
     }
+
+        // return response()->json([
+        //     'message' => 'Profile updated successfully',
+        //     'user' => $user->fresh()
+        // ]);
+        //  }
 }
