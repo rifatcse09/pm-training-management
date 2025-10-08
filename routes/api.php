@@ -36,6 +36,12 @@ Route::prefix('v1')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::put('/profile', [ProfileController::class, 'update']);
 
+        // Dashboard routes
+        Route::prefix('dashboard')->group(function () {
+            Route::get('/', [App\Http\Controllers\Api\v1\DashboardController::class, 'index']);
+            Route::get('/training-stats', [App\Http\Controllers\Api\v1\DashboardController::class, 'trainingStats']);
+        });
+
         // Employee routes
         Route::get('employees', [EmployeeController::class, 'index']);
         Route::post('employees', [EmployeeController::class, 'store']);
@@ -70,7 +76,7 @@ Route::prefix('v1')->group(function () {
 
     Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
     Route::post('/reset-password', [PasswordResetController::class, 'reset']);
-    
+
     Route::middleware(['auth:api', 'IsAdmin'])->group(function () {
         Route::get('/admin/pending-users', [AdminController::class, 'listPendingUsers']);
         Route::post('/admin/activate-user/{id}', [AdminController::class, 'activateUser']);
@@ -79,4 +85,6 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::get('/training-reports', [TrainingReportController::class, 'generateReport']);
+
+
 });
