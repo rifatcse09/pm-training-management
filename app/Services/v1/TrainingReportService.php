@@ -126,7 +126,7 @@ class TrainingReportService
     }
 
 
-     public function nineGradeSingleEmployeeWiseReport(array $filters)
+    public function nineGradeSingleEmployeeWiseReport(array $filters)
     {
         $query = GroupTraining::query();
 

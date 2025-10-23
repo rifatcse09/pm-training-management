@@ -1,9 +1,10 @@
 {{-- filepath: /var/www/pm-training-app/resources/views/pdf/reports/employee-training.blade.php --}}
 <!DOCTYPE html>
 <html lang="bn">
+
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Employee Training Report</title>
     <style>
         @page {
@@ -50,7 +51,8 @@
             margin-bottom: 25px;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid #333;
             padding: 6px 8px;
             text-align: left;
@@ -83,13 +85,31 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Header Section -->
     <div class="header bangla-text">
         <h1>গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</h1>
         <p>পরিকল্পনা মন্ত্রণালয়</p>
         <p>পরিকল্পনা বিভাগ</p>
-        <p style="margin-top: 10px; font-weight: bold;">বিষয়ঃ কর্মচারী/কর্মকর্তা ভিত্তিক প্রশিক্ষনের প্রতিবেদন</p>
+        <p style="margin-top: 10px; font-weight: bold;">
+            বিষয়ঃ
+            @if (isset($filters['subject']))
+                @if ($filters['subject'] == 1 || $filters['subject'] == 2 || $filters['subject'] == 3)
+                    ৯ম-তদুর্ধ্ব গ্রেডের
+                @elseif($filters['subject'] == 4 || $filters['subject'] == 5 || $filters['subject'] == 6)
+                    ১০ম গ্রেডের
+                @elseif($filters['subject'] == 7 || $filters['subject'] == 8 || $filters['subject'] == 9)
+                    ১১-১৬তম গ্রেডের
+                @elseif($filters['subject'] == 10 || $filters['subject'] == 11 || $filters['subject'] == 12)
+                    ১৭-২০তম গ্রেডের
+                @else
+                @endif
+            @else
+                ৯ম-তদুর্ধ্ব গ্রেডের
+            @endif
+            সকল কর্মকর্তার প্রশিক্ষনের প্রতিবেদন
+        </p>
     </div>
 
     <!-- Unified Employee Data Table -->
@@ -113,44 +133,45 @@
         <tbody>
             @php $serial = 1; @endphp
             {{-- @foreach ($reportData as $training)
-                @if(isset($training['employees']) && count($training['employees']) > 0) --}}
-                @foreach ($reportData as $employee)
-                    <tr>
-                        <td class="number-cell">{{ $serial++ }}</td>
-                        <td class="employee-name bangla-text">{{ $employee['employee_name'] ?? 'তথ্য নেই' }}</td>
-                        <td class="bangla-text">{{ $employee['designation'] ?? 'তথ্য নেই' }}</td>
-                        <td class="mixed-content">{{ $employee['mobile'] ?? 'তথ্য নেই' }}</td>
-                        <td class="bangla-text">{{ $employee['working_place'] ?? 'তথ্য নেই' }}</td>
-                        <td class="bangla-text">{{ $employee['organizer_name'] ?? 'তথ্য নেই' }}</td>
-                        <td class="training-subject bangla-text">{{ $employee['training_name'] ?? 'তথ্য নেই' }}</td>
-                        <td class="check-mark">
-                            {{ (isset($employee['training_type']) && $employee['training_type'] == 'স্থানীয় প্রশিক্ষণ') ? 'স্থানীয়' : '' }}
-                        </td>
-                        <td class="check-mark">
-                            {{ (isset($employee['training_type']) && $employee['training_type'] == 'বৈদেশিক প্রশিক্ষণ') ? $employee['training_countries'] : '' }}
-                        </td>
-                        <td class="date-cell">{{ $employee['start_date'] ?? 'তথ্য নেই' }}</td>
-                        <td class="date-cell">{{ $employee['end_date'] ?? 'তথ্য নেই' }}</td>
-                        <td class="number-cell">{{ $employee['total_days'] ?? '০' }} দিন</td>
-                    </tr>
-                    @endforeach
+                @if (isset($training['employees']) && count($training['employees']) > 0) --}}
+            @foreach ($reportData as $employee)
+                <tr>
+                    <td class="number-cell">{{ $serial++ }}</td>
+                    <td class="employee-name bangla-text">{{ $employee['employee_name'] ?? 'তথ্য নেই' }}</td>
+                    <td class="bangla-text">{{ $employee['designation'] ?? 'তথ্য নেই' }}</td>
+                    <td class="mixed-content">{{ $employee['mobile'] ?? 'তথ্য নেই' }}</td>
+                    <td class="bangla-text">{{ $employee['working_place'] ?? 'তথ্য নেই' }}</td>
+                    <td class="bangla-text">{{ $employee['organizer_name'] ?? 'তথ্য নেই' }}</td>
+                    <td class="training-subject bangla-text">{{ $employee['training_name'] ?? 'তথ্য নেই' }}</td>
+                    <td class="check-mark">
+                        {{ isset($employee['training_type']) && $employee['training_type'] == 'স্থানীয় প্রশিক্ষণ' ? 'স্থানীয়' : '' }}
+                    </td>
+                    <td class="check-mark">
+                        {{ isset($employee['training_type']) && $employee['training_type'] == 'বৈদেশিক প্রশিক্ষণ' ? $employee['training_countries'] : '' }}
+                    </td>
+                    <td class="date-cell">{{ $employee['start_date'] ?? 'তথ্য নেই' }}</td>
+                    <td class="date-cell">{{ $employee['end_date'] ?? 'তথ্য নেই' }}</td>
+                    <td class="number-cell">{{ $employee['total_days'] ?? '০' }} দিন</td>
+                </tr>
+            @endforeach
 
         </tbody>
     </table>
 
     <!-- Summary Footer -->
-    @if(count($reportData) > 1)
-    <div class="footer bangla-text">
-        {{-- <p><strong>মোট প্রশিক্ষণের সংখ্যা:</strong> {{ count($reportData) }}</p>
+    @if (count($reportData) > 1)
+        <div class="footer bangla-text">
+            {{-- <p><strong>মোট প্রশিক্ষণের সংখ্যা:</strong> {{ count($reportData) }}</p>
         <p><strong>মোট অংশগ্রহণকারী:</strong>
             {{ collect($reportData)->sum(function($training) {
                 return isset($training['employees']) ? count($training['employees']) : 0;
             }) }}
         </p> --}}
-        <p style="margin-top: 15px; font-size: 10px; color: #888;">
-            এই প্রতিবেদনটি {{ $generatedAt->format('d/m/Y H:i:s') }} তারিখে স্বয়ংক্রিয়ভাবে তৈরি করা হয়েছে।
-        </p>
-    </div>
+            <p style="margin-top: 15px; font-size: 10px; color: #888;">
+                এই প্রতিবেদনটি {{ $generatedAt->format('d/m/Y H:i:s') }} তারিখে স্বয়ংক্রিয়ভাবে তৈরি করা হয়েছে।
+            </p>
+        </div>
     @endif
 </body>
+
 </html>
