@@ -23,8 +23,11 @@ class TrainingReportController extends Controller
 
         try {
             if ($filters['subject'] == 1) {
-                return $this->generateEmployeeBasedReport($filters);
-            } else {
+                return $this->generateNineGradeEmployeeReport($filters);
+            }  elseif ($filters['subject'] == 2) {
+                return $this->generateSingleNineEmployeeBasedReport($filters);
+            }
+            else {
                 return $this->generateSingleEmployeeBasedReport($filters);
             }
         } catch (\Exception $e) {
@@ -34,6 +37,38 @@ class TrainingReportController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    private function generateNineGradeEmployeeReport(array $filters)
+    {
+        $reportData = $this->reportService->nineGradeEmployeeBasedReport($filters);
+        $pdf = PDF::loadView('pdf.reports.employee-training', [
+            'reportData' => $reportData,
+            'filters' => $filters,
+            'generatedAt' => now(),
+        ], [], ['mode' => 'utf-8', 'format' => 'A4-L']);
+
+        $filename = 'employee-training-report-' . now()->format('Y-m-d_H-i-s') . '.pdf';
+
+        return response($pdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', "attachment; filename=\"$filename\"");
+    }
+
+    private function generateSingleNineEmployeeBasedReport(array $filters)
+    {
+        $reportData = $this->reportService->nineGradeSingleEmployeeWiseReport($filters);
+        $pdf = PDF::loadView('pdf.reports.single-employee-training', [
+            'reportData' => $reportData,
+            'filters' => $filters,
+            'generatedAt' => now(),
+        ], [], ['mode' => 'utf-8', 'format' => 'A4-L']);
+
+        $filename = 'single-employee-training-report-' . now()->format('Y-m-d_H-i-s') . '.pdf';
+
+        return response($pdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', "attachment; filename=\"$filename\"");
     }
 
     private function generateEmployeeBasedReport(array $filters)

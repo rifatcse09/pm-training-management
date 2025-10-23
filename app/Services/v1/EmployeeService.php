@@ -12,21 +12,41 @@ class EmployeeService
         $query = Employee::query();
 
         if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%$search%")
-                  ->orWhere('email', 'LIKE', "%$search%")
-                  ->orWhere('mobile', 'LIKE', "%$search%")
-                  ->orWhereHas('designation', function ($q) use ($search) {
-                      $q->where('name', 'LIKE', "%$search%")
-                        ->orWhere('grade', 'LIKE', "%$search%"); // Search in grade
-                  });
+            // Handle special grade search conditions separately
+            if (strtolower($search) === 'grade-9') {
+                $query->whereHas('designation', function ($q) {
+                    $q->whereIn('id', range(1, 29));
+                });
+            } elseif (strtolower($search) === 'grade-10') {
+                $query->whereHas('designation', function ($q) {
+                    $q->where('grade', '=', '১০');
+                });
+            } elseif (strtolower($search) === 'grade-11-16') {
+                $query->whereHas('designation', function ($q) {
+                    $q->whereIn('id', [35, 45]);
+                });
+            } elseif (strtolower($search) === 'grade-17-20') {
+                $query->whereHas('designation', function ($q) {
+                    $q->where('id', '>=', 46);
+                });
+            } else {
+                // Handle general search for other cases
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%$search%")
+                    ->orWhere('email', 'LIKE', "%$search%")
+                    ->orWhere('mobile', 'LIKE', "%$search%")
+                    ->orWhereHas('designation', function ($q) use ($search) {
+                        $q->where('name', 'LIKE', "%$search%")
+                            ->orWhere('grade', 'LIKE', "%$search%");
+                    });
 
-                // Map working place name to ID using WorkingPlaceEnum
-                $workingPlaceId = array_search($search, WorkingPlaceEnum::getNames());
-                if ($workingPlaceId !== false) {
-                    $q->orWhere('working_place', $workingPlaceId);
-                }
-            });
+                    // Map working place name to ID using WorkingPlaceEnum
+                    $workingPlaceId = array_search($search, WorkingPlaceEnum::getNames());
+                    if ($workingPlaceId !== false) {
+                        $q->orWhere('working_place', $workingPlaceId);
+                    }
+                });
+            }
         }
 
         if ($workingPlace) {
