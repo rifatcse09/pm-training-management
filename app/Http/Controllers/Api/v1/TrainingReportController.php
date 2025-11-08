@@ -19,15 +19,14 @@ class TrainingReportController extends Controller
 
     public function generateReport(Request $request)
     {
-        $filters = $request->only(['subject', 'employee_id', 'fiscal_years', 'start_date', 'end_date']);
+        $filters = $request->only(['subject', 'employee_id','training_id', 'fiscal_years', 'start_date', 'end_date']);
 
         try {
-            if ($filters['subject'] == 1) {
+            if ($filters['subject'] == 1  || $filters['subject'] == 3) {
                 return $this->generateNineGradeEmployeeReport($filters);
             }  elseif ($filters['subject'] == 2) {
                 return $this->generateSingleNineEmployeeBasedReport($filters);
-            }
-            else {
+            } else {
                 return $this->generateSingleEmployeeBasedReport($filters);
             }
         } catch (\Exception $e) {

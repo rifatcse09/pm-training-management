@@ -34,7 +34,7 @@ class TrainingReportService
 
         // Calendar date range (overlap)
         $filterStart = !empty($filters['start_date']) ? Carbon::parse($filters['start_date'])->toDateString() : null;
-        $filterEnd   = !empty($filters['end_date'])   ? Carbon::parse($filters['end_date'])->toDateString()   : null;
+        $filterEnd   = !empty($filters['end_date'])   ? Carbon::parse($filters['end_date'])->toDateString() : null;
 
         if ($filterStart && $filterEnd) {
             $query->where('start_date', '<=', $filterEnd)
@@ -47,13 +47,20 @@ class TrainingReportService
 
         // Eager load
         $query->with([
-            'employeeTrainings' => function ($et) {
+            'employeeTrainings' => function ($et) use ($filters) {
                 $et->where(function ($q) {
                     $q->whereIn('designation_id', range(1, 29))
                     ->orWhereHas('designation', function ($desigQuery) {
                         $desigQuery->whereIn('id', range(1, 29));
                     });
-                })->with([
+                });
+
+                // Add training_id filter if provided
+                if (!empty($filters['training_id'])) {
+                    $et->where('training_id', $filters['training_id']);
+                }
+
+                $et->with([
                     'employee.designation',
                     'designation', // optional: if designation_id is on employee_trainings
                     'training.organizer',
@@ -125,7 +132,6 @@ class TrainingReportService
         return $reportRows;
     }
 
-
     public function nineGradeSingleEmployeeWiseReport(array $filters)
     {
         $query = GroupTraining::query();
@@ -167,6 +173,7 @@ class TrainingReportService
                 $q->where('employee_id', $filters['employee_id']);
             });
         }
+
 
         // Eager load only the specific employee's data
         $query->with([
@@ -259,7 +266,7 @@ class TrainingReportService
 
         // Calendar date range (overlap)
         $filterStart = !empty($filters['start_date']) ? Carbon::parse($filters['start_date'])->toDateString() : null;
-        $filterEnd   = !empty($filters['end_date'])   ? Carbon::parse($filters['end_date'])->toDateString()   : null;
+        $filterEnd   = !empty($filters['end_date'])   ? Carbon::parse($filters['end_date'])->toDateString() : null;
 
         if ($filterStart && $filterEnd) {
             $query->where('start_date', '<=', $filterEnd)
