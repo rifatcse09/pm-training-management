@@ -82,4 +82,29 @@ class AdminController extends Controller
             'data' => new UserResource($user),
         ], HttpStatus::OK);
     }
+
+    public function updateUser(Request $request, int $userId): JsonResponse
+    {
+        $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|unique:users,email,' . $userId,
+            'designation_id' => 'sometimes|nullable|integer|exists:designations,id',
+            'role_id' => 'sometimes|nullable|integer|exists:roles,id'
+        ]);
+
+        $user = $this->adminService->updateUser($userId, $request->only(['name', 'email', 'designation_id', 'role_id']));
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'error' => 'User not found',
+            ], HttpStatus::NOT_FOUND);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => new UserResource($user),
+            'message' => 'User updated successfully'
+        ], HttpStatus::OK);
+    }
 }

@@ -41,7 +41,7 @@ class AdminService
      */
     public function listAllUsers(): Collection
     {
-        return User::with('role')->where('is_active', 1)->get();
+        return User::with(['role', 'designation'])->where('is_active', 1)->get();
     }
 
     /**
@@ -56,5 +56,22 @@ class AdminService
         }
 
         return $user;
+    }
+
+    /**
+     * Update a user by ID.
+     */
+    public function updateUser(int $userId, array $data): ?User
+    {
+        $user = User::find($userId);
+
+        if (!$user) {
+            return null;
+        }
+
+        $user->fill($data);
+        $user->save();
+
+        return $user->load(['role', 'designation']);
     }
 }
