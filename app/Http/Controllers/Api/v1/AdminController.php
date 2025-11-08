@@ -29,6 +29,10 @@ class AdminController extends Controller
 
     public function activateUser(Request $request, int $userId): JsonResponse
     {
+        $request->validate([
+            'role_id' => 'nullable|integer|exists:roles,id'
+        ]);
+
         $user = $this->adminService->activateUser($userId);
 
         if (!$user) {
@@ -37,6 +41,14 @@ class AdminController extends Controller
                 'error' => 'User not found or already active',
             ], HttpStatus::NOT_FOUND);
         }
+
+        $user->is_active = true;
+
+        if ($request->has('role_id') && $request->role_id) {
+            $user->role_id = $request->role_id;
+        }
+
+        $user->save();
 
         return response()->json([
             'success' => true,
