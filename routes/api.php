@@ -41,12 +41,6 @@ Route::prefix('v1')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::put('/profile', [ProfileController::class, 'update']);
 
-        // Dashboard routes
-        // Route::prefix('dashboard')->group(function () {
-        //     Route::get('/', [App\Http\Controllers\Api\v1\DashboardController::class, 'index']);
-        //     Route::get('/training-stats', [App\Http\Controllers\Api\v1\DashboardController::class, 'trainingStats']);
-        // });
-
         // Dashboard routes (view-only)
         Route::prefix('dashboard')->group(function () {
             Route::get('/', [DashboardController::class, 'index'])
@@ -71,14 +65,6 @@ Route::prefix('v1')->group(function () {
         Route::delete('employees/{id}', [EmployeeController::class, 'destroy'])
             ->middleware('role:admin');
 
-        // Employee routes
-        // Route::get('employees', [EmployeeController::class, 'index']);
-        // Route::post('employees', [EmployeeController::class, 'store']);
-        // Route::get('employees/{id}', [EmployeeController::class, 'show']);
-        // Route::put('employees/{id}', [EmployeeController::class, 'update']);
-        // Route::delete('employees/{id}', [EmployeeController::class, 'destroy']);
-        // Route::get('employees/{id}/trainings', [TrainingAssignmentController::class, 'getEmployeeTrainings'])->name('employees.trainings');
-
        // Training routes
         Route::controller(TrainingController::class)->group(function () {
             // view
@@ -97,28 +83,6 @@ Route::prefix('v1')->group(function () {
             // delete
             Route::delete('trainings/{id}', 'destroy')->middleware('role:admin');
         });
-
-
-
-        // Training routes
-        // Route::controller(TrainingController::class)->group(function () {
-        //     Route::get('trainings', 'index');
-        //     Route::post('trainings', 'store'); // Add this line to support POST requests
-        //     Route::get('trainings/assignments', [TrainingAssignmentController::class, 'index'])->name('trainings.assignments'); // Ensure this route is defined first
-        //     Route::get('trainings/{id}', 'show')->where('id', '[0-9]+'); // Add constraint to match only numeric IDs
-        //     Route::put('trainings/{id}', 'update');
-        //     Route::delete('trainings/{id}', 'destroy');
-        // });
-
-        // Organizer routes
-        // Route::controller(OrganizerController::class)->group(function () {
-        //     Route::get('organizers', 'index');
-        //     Route::post('organizers', 'store');
-        //     Route::get('organizers/{id}', 'show');
-        //     Route::put('organizers/{id}', 'update');
-        //     Route::delete('organizers/{id}', 'destroy');
-        //     Route::get('project-organizers', 'getProjectOrganizers'); // New route
-        // });
 
         // Organizer routes
         Route::controller(OrganizerController::class)->group(function () {
@@ -143,9 +107,6 @@ Route::prefix('v1')->group(function () {
 
         Route::get('training-assignments/pdf', [TrainingAssignmentController::class, 'generateAssignmentsPdf'])
             ->middleware('role:admin,operator,officer');
-
-        // Route::post('trainings/assign', [TrainingAssignmentController::class, 'assign'])->name('trainings.assign');
-        // Route::get('training-assignments/pdf', [TrainingAssignmentController::class, 'generateAssignmentsPdf']);
     });
 
 
@@ -155,12 +116,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/admin/users', [AdminController::class, 'listAllUsers']);
         Route::put('/admin/users/{id}', [AdminController::class, 'updateUser']);
         Route::post('/admin/assign-role/{id}', [AdminController::class, 'assignRole']);
+        Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser']);
     });
 
     // If this should be protected & view-only:
     Route::get('/training-reports', [TrainingReportController::class, 'generateReport'])
             ->middleware(['auth:api', 'role:admin,operator,officer']);
-
-    // Route::get('/training-reports', [TrainingReportController::class, 'generateReport']);
 
 });

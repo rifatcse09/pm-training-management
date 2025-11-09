@@ -5,6 +5,7 @@ namespace App\Services\v1;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
 
 class AdminService
 {
@@ -73,5 +74,28 @@ class AdminService
         $user->save();
 
         return $user->load(['role', 'designation']);
+    }
+
+    public function deleteUser(int $userId): bool
+    {
+        try {
+            // Prevent admin from deleting themselves
+            if (Auth::id() === $userId) {
+                throw new \Exception('You cannot delete your own account');
+            }
+
+            $user = User::find($userId);
+            
+            if (!$user) {
+                return false;
+            }
+
+            // Optional: Add additional checks before deletion
+            // For example, check if user has related data that shouldn't be deleted
+            
+            return $user->delete();
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 }
