@@ -30,6 +30,10 @@ Route::prefix('v1')->group(function () {
 
     Route::apiResource('designations', DesignationController::class);
 
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
+
+    Route::post('/reset-password', [PasswordResetController::class, 'reset']);
+
     // Protected routes
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -74,8 +78,6 @@ Route::prefix('v1')->group(function () {
         Route::get('training-assignments/pdf', [TrainingAssignmentController::class, 'generateAssignmentsPdf']);
     });
 
-    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
-    Route::post('/reset-password', [PasswordResetController::class, 'reset']);
 
     Route::middleware(['auth:api', 'IsAdmin'])->group(function () {
         Route::get('/admin/pending-users', [AdminController::class, 'listPendingUsers']);
@@ -86,6 +88,5 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::get('/training-reports', [TrainingReportController::class, 'generateReport']);
-
 
 });
