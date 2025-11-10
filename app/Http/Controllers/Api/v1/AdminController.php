@@ -107,4 +107,28 @@ class AdminController extends Controller
             'message' => 'User updated successfully'
         ], HttpStatus::OK);
     }
+
+    public function deleteUser(int $userId): JsonResponse
+    {
+        try {
+            $deleted = $this->adminService->deleteUser($userId);
+
+            if (!$deleted) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'User not found or cannot be deleted',
+                ], HttpStatus::NOT_FOUND);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User deleted successfully',
+            ], HttpStatus::OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to delete user: ' . $e->getMessage(),
+            ], HttpStatus::INTERNAL_SERVER_ERROR);
+        }
+    }
 }
