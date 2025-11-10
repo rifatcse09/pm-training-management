@@ -24,7 +24,7 @@ class TrainingReportController extends Controller
         try {
             if ($filters['subject'] == 1  || $filters['subject'] == 3) {
                 return $this->generateNineGradeEmployeeReport($filters);
-            }  elseif ($filters['subject'] == 2) {
+            }  elseif ($filters['subject'] == 2 || $filters['subject'] == 5 || $filters['subject'] == 8 || $filters['subject'] == 11) {
                 return $this->generateSingleNineEmployeeBasedReport($filters);
             }  elseif ($filters['subject'] == 4  || $filters['subject'] == 6) {
                 return $this->generateTenGradeEmployeeReport($filters);
