@@ -26,6 +26,8 @@ class TrainingReportController extends Controller
                 return $this->generateNineGradeEmployeeReport($filters);
             }  elseif ($filters['subject'] == 2) {
                 return $this->generateSingleNineEmployeeBasedReport($filters);
+            }  elseif ($filters['subject'] == 4  || $filters['subject'] == 6) {
+                return $this->generateTenGradeEmployeeReport($filters);
             } else {
                 return $this->generateSingleEmployeeBasedReport($filters);
             }
@@ -36,6 +38,22 @@ class TrainingReportController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    private function generateTenGradeEmployeeReport(array $filters)
+    {
+        $reportData = $this->reportService->tenGradeEmployeeBasedReport($filters);
+        $pdf = PDF::loadView('pdf.reports.employee-training', [
+            'reportData' => $reportData,
+            'filters' => $filters,
+            'generatedAt' => now(),
+        ], [], ['mode' => 'utf-8', 'format' => 'A4-L']);
+
+        $filename = 'employee-training-report-' . now()->format('Y-m-d_H-i-s') . '.pdf';
+
+        return response($pdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', "attachment; filename=\"$filename\"");
     }
 
     private function generateNineGradeEmployeeReport(array $filters)
