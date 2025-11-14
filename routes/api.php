@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\v1\DesignationController;
 use App\Http\Controllers\Api\v1\TrainingReportController;
 use App\Http\Controllers\Api\v1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\v1\TrainingAssignmentController;
+use App\Http\Controllers\Api\v1\MonthlyChartController;
 
 Route::prefix('v1')->group(function () {
 
@@ -46,6 +47,8 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [DashboardController::class, 'index'])
                 ->middleware('role:admin,operator,officer');
             Route::get('/training-stats', [DashboardController::class, 'trainingStats'])
+                ->middleware('role:admin,operator,officer');
+            Route::get('/monthly-chart', [MonthlyChartController::class, 'getMonthlyData'])
                 ->middleware('role:admin,operator,officer');
         });
 
