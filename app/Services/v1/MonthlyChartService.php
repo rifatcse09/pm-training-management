@@ -23,12 +23,9 @@ class MonthlyChartService
         if ($designationType === 'ninth_grade') {
             $query->whereBetween('employee_training.designation_id', [1, 29]);
             $seriesName = 'Employees Trained (9th Grade)';
-        } elseif ($designationType === 'upper_grade') {
+        } else {
             $query->where('employee_training.designation_id', '>', 29);
             $seriesName = 'Employees Trained (Upper Grade)';
-        } else {
-            // All designations
-            $seriesName = 'Employees Trained (All Grades)';
         }
 
         // Add query logging
