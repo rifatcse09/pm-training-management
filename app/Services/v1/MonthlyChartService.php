@@ -28,10 +28,6 @@ class MonthlyChartService
             $seriesName = 'Employees Trained (Upper Grade)';
         }
 
-        // Add query logging
-        \Log::info('Query SQL: ' . $query->toSql());
-        \Log::info('Query Bindings: ', $query->getBindings());
-
         // Check if start_date is not null
         $query->whereNotNull('group_trainings.start_date');
 
@@ -42,19 +38,6 @@ class MonthlyChartService
             ->get()
             ->pluck('count', 'month')
             ->toArray();
-
-        \Log::info('Monthly Data Result: ', $monthlyData);
-        \Log::info('Year: ' . $year);
-
-        // Check total records in table
-        $totalRecords = EmployeeTraining::count();
-        \Log::info('Total EmployeeTraining records: ' . $totalRecords);
-
-        // Check records for the year with join
-        $yearRecords = EmployeeTraining::join('group_trainings', 'employee_training.group_training_id', '=', 'group_trainings.id')
-            ->whereYear('group_trainings.start_date', $year)
-            ->count();
-        \Log::info('Records for year ' . $year . ': ' . $yearRecords);
 
         return $this->formatMonthlyData($monthlyData, $seriesName);
     }
