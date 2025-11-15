@@ -19,7 +19,7 @@ class EmployeeService
                 });
             } elseif (strtolower($search) === 'grade-10') {
                 $query->whereHas('designation', function ($q) {
-                    $q->where('grade', '=', '১০');
+                    $q->whereIn('id', [30, 34]);
                 });
             } elseif (strtolower($search) === 'grade-11-16') {
                 $query->whereHas('designation', function ($q) {
