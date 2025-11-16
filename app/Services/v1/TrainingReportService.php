@@ -5,6 +5,7 @@ namespace App\Services\v1;
 use Carbon\Carbon;
 use App\Models\GroupTraining;
 use App\Enums\WorkingPlaceEnum;
+use App\Enums\SubjectGradeMappingEnum;
 use Illuminate\Support\Facades\Log;
 
 class TrainingReportService
@@ -137,23 +138,19 @@ class TrainingReportService
     }
 
     /**
-     * Apply designation filter based on subject
+     * Apply designation filter based on subject using enum
      */
     private function applyDesignationFilter($query, int $subject)
     {
-        // Define designation ranges for each subject
-        $subjectDesignationMap = [
-            1 => range(1, 29),    // up to 9th grade
-            3 => range(1, 29),    // up to 9th grade
-            4 => range(30, 34),   // 10th grade
-            6 => range(30, 34),   // 10th grade
-            7 => range(35, 45),   // 11th to 16th grade
-            9 => range(30, 45),   // 10th to 16th grade
-            10 => '>45',          // 17th to 20th grade (special case)
-            12 => '>45',          // 17th to 20th grade (special case)
-        ];
+        $subjectEnum = SubjectGradeMappingEnum::fromInt($subject);
+        
+        if (!$subjectEnum) {
+            // Default to 9th grade if subject not found
+            $this->applyDesignationRangeFilter($query, range(1, 29));
+            return;
+        }
 
-        $designationRange = $subjectDesignationMap[$subject] ?? range(1, 29); // Default to 9th grade
+        $designationRange = $subjectEnum->getDesignationRange();
 
         if ($designationRange === '>45') {
             // Special case for designations greater than 45
@@ -161,10 +158,11 @@ class TrainingReportService
                   ->orWhereHas('designation', function ($desigQuery) {
                       $desigQuery->where('id', '>', 45);
                   });
-        } else {
+        } elseif (!empty($designationRange)) {
             // Normal range filtering
             $this->applyDesignationRangeFilter($query, $designationRange);
         }
+        // If empty array (like PROJECT_BASED), no designation filter applied
     }
 
     /**

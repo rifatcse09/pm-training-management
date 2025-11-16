@@ -4,6 +4,7 @@ namespace App\Services\v1;
 
 use App\Models\Employee;
 use App\Enums\WorkingPlaceEnum;
+use App\Enums\SubjectGradeMappingEnum;
 
 class EmployeeService
 {
@@ -12,23 +13,11 @@ class EmployeeService
         $query = Employee::query();
 
         if ($search) {
-            // Handle special grade search conditions separately
-            if (strtolower($search) === 'grade-9') {
-                $query->whereHas('designation', function ($q) {
-                    $q->whereIn('id', range(1, 29));
-                });
-            } elseif (strtolower($search) === 'grade-10') {
-                $query->whereHas('designation', function ($q) {
-                    $q->whereIn('id', [30, 34]);
-                });
-            } elseif (strtolower($search) === 'grade-11-16') {
-                $query->whereHas('designation', function ($q) {
-                    $q->whereIn('id', [35, 45]);
-                });
-            } elseif (strtolower($search) === 'grade-17-20') {
-                $query->whereHas('designation', function ($q) {
-                    $q->where('id', '>=', 46);
-                });
+            // Handle special grade search conditions using enum
+            $gradeEnum = SubjectGradeMappingEnum::fromGradeSearchTerm($search);
+            
+            if ($gradeEnum) {
+                $this->applyGradeFilterFromEnum($query, $gradeEnum);
             } else {
                 // Handle general search for other cases
                 $query->where(function ($q) use ($search) {
@@ -58,6 +47,25 @@ class EmployeeService
         }
 
         return $query->with('designation')->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    /**
+     * Apply grade filter using enum instance
+     */
+    private function applyGradeFilterFromEnum($query, SubjectGradeMappingEnum $gradeEnum): void
+    {
+        $designationRange = $gradeEnum->getDesignationRange();
+
+        if ($designationRange === '>45') {
+            // Special case for designations greater than 45
+            $query->whereHas('designation', function ($q) {
+                $q->where('id', '>', 45);
+            });
+        } elseif (is_array($designationRange) && !empty($designationRange)) {
+            $query->whereHas('designation', function ($q) use ($designationRange) {
+                $q->whereIn('id', $designationRange);
+            });
+        }
     }
 
     public function createEmployee(array $data)

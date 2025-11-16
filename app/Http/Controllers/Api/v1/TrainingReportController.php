@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\v1\TrainingReportService;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
+use App\Enums\SubjectGradeMappingEnum;
 
 class TrainingReportController extends Controller
 {
@@ -23,20 +24,23 @@ class TrainingReportController extends Controller
 
         try {
             $subject = (int)$filters['subject'];
+            $subjectEnum = SubjectGradeMappingEnum::fromInt($subject);
 
-            // Define subject categories
-            $gradeWiseAllEmployeeSubjects = [1, 3, 4, 6, 7, 9, 10, 12];
-            $singleEmployeeSubjects = [2, 5, 8, 11];
-
-            if (in_array($subject, $gradeWiseAllEmployeeSubjects)) {
-                return $this->generateGradeWiseAllEmployeeReport($filters);
-            } elseif (in_array($subject, $singleEmployeeSubjects)) {
-                return $this->generateSingleEmployeeBasedReport($filters);
-            } else {
-                // Default behavior or error handling for unknown subjects
+            if (!$subjectEnum) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid subject parameter provided.',
+                ], 400);
+            }
+
+            if ($subjectEnum->isGradeWiseAllReport()) {
+                return $this->generateGradeWiseAllEmployeeReport($filters);
+            } elseif ($subjectEnum->isSingleEmployeeReport()) {
+                return $this->generateSingleEmployeeBasedReport($filters);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unsupported report type.',
                 ], 400);
             }
         } catch (\Exception $e) {
